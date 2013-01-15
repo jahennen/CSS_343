@@ -1,6 +1,14 @@
 #include "list.h"
 #include <string.h>
 
+struct ListNode {
+	struct ListNode* next;
+	int count;
+	char data[0];
+};
+
+typedef struct ListNode ListNode;
+
 ListNode* new_node(char* data);
 
 // Add new node after current and return new node.
@@ -8,15 +16,17 @@ ListNode* append(ListNode* current, char * data) {
 	ListNode* new = new_node(data);
 	new->next = current->next;
 	current->next = new;
-	return current;
+	return current->next;
 }
 
 
 // Delete next node (not current), returning current node (or NULL if
 // the list only had a single element).
 ListNode* del(ListNode* current) {
-	if (current->next == current)
+	if (current->next == current){	//List has a single element so
+		deallocate(current);		//Deallocate mem and return NULL
 		return NULL;
+	}
 	ListNode* temp = current->next;
 	current->next = temp->next;
 	deallocate(temp);
@@ -46,7 +56,18 @@ void print_length(ListNode* current) {
 
 
 // Print list to stderr (for debugging).
-void dump_list(ListNode* current) {}
+void dump_list(ListNode* current) {
+	if (current == NULL) {
+		fprintf(stderr, "List is empty!\n");
+		return;
+	}
+	ListNode* end = current;
+	fprintf(stderr,"List is as follows:\n");
+	do {
+		fprintf(stderr,"%s # = %d\n", current->data, current->count);
+		current = current->next;
+	} while (current != end);
+}
 
 ListNode* new_node(char* word) {
 	ListNode* new = (ListNode*)allocate(sizeof(ListNode) + strlen(word) +1);

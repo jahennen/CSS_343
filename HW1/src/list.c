@@ -1,16 +1,11 @@
 #include "list.h"
 #include <string.h>
 
-void init_list(ListNode* root) {
-	init_arena();
-	root = (ListNode*)allocate(sizeof(ListNode));
-	root->next = root;
-	root->count = 0;
-}
+ListNode* new_node(char* data);
 
 // Add new node after current and return new node.
 ListNode* append(ListNode* current, char * data) {
-	ListNode new = new_node(data);
+	ListNode* new = new_node(data);
 	new->next = current->next;
 	current->next = new;
 	return current;

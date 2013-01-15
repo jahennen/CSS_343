@@ -79,7 +79,7 @@ void* allocate(size_t request) {
 // Things could happen.
 void deallocate(void * mem){
 	if (root + ARENA_SIZE <= mem) {
-		die();
+		return;
 	}
 
 	size_t hdr = sizeof(Free_node);

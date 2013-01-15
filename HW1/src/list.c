@@ -22,7 +22,7 @@ ListNode* append(ListNode* current, char * data) {
 ListNode* del(ListNode* current) {
 	if (current->next == current)
 		return NULL;
-	ListNode temp = current->next;
+	ListNode* temp = current->next;
 	current->next = temp->next;
 	deallocate(temp);
 	return current;

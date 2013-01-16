@@ -9,7 +9,13 @@
 #include "allocator.h"
 #include <stdlib.h>
 
-struct ListNode;
+struct ListNode {
+	struct ListNode* next;
+	int count;
+	char data[0];
+};
+
+typedef struct ListNode ListNode;
 
 
 

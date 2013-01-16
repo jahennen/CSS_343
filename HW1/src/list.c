@@ -1,14 +1,6 @@
 #include "list.h"
 #include <string.h>
 
-struct ListNode {
-	struct ListNode* next;
-	int count;
-	char data[0];
-};
-
-typedef struct ListNode ListNode;
-
 ListNode* new_node(char* data);
 
 // Add new node after current and return new node.
@@ -64,7 +56,7 @@ void dump_list(ListNode* current) {
 	ListNode* end = current;
 	fprintf(stderr,"List is as follows:\n");
 	do {
-		fprintf(stderr,"%s # = %d\n", current->data, current->count);
+		fprintf(stderr,"%d %s\n", current->count, current->data);
 		current = current->next;
 	} while (current != end);
 }

@@ -4,14 +4,6 @@
 
 #define MAX_LEN 128
 
-struct ListNode {
-	struct ListNode* next;
-	int count;
-	char data[0];
-};
-
-typedef struct ListNode ListNode;
-
 ListNode* increment(ListNode* current, char* in_buffer);
 ListNode* decrement(ListNode* current, char* in_buffer);
 ListNode* locate(ListNode* current, char* in_buffer);
@@ -20,13 +12,12 @@ ListNode* locate(ListNode* current, char* in_buffer);
 int main() {
 	init_arena();
 	ListNode* current = NULL;
-	while(1) {
-		char in_buffer[MAX_LEN] = {0};
+	char in_buffer[MAX_LEN] = {0};
+	while(fgets(in_buffer,MAX_LEN,stdin)) {
 		char opt;
 		char* word;
 		//printf("Type 'a' or 'd' then a space, followed by a word\n");
 		//printf("Like this: 'a hello'\n");
-		fgets(in_buffer,MAX_LEN,stdin);
 		int i;
 		for (i= 0; i < strlen(in_buffer);i++) // quick loop to cut the \n off
 					if (in_buffer[i]=='\n')   // fgets i never asked for this
@@ -48,9 +39,9 @@ int main() {
 		if (opt == 'd') {
 			current = decrement(current, word);
 		}
-		dump_list(current);
 		//printf("\n");
 	}
+	dump_list(current);
     return 0;
 }
 
@@ -89,17 +80,17 @@ ListNode* decrement(ListNode* current, char* word) {
 
 // Locates the node before the search parameter 'word'
 // Note that this may be the node itself, if list has 1 element
+// If word is not found, current is unchanged
 ListNode* locate(ListNode* current, char* word) {
 	if (current == NULL) {
 		fprintf(stderr, "Tried to locate in empty list\n");
 		return current;
 	}
-	ListNode* end = current;
+	ListNode* end = current->next;
 	do {
 		if(strcmp(word, current->next->data) == 0)
 			return current;
 		current = current->next;
-	} while(current != end);
-	fprintf(stderr, "Word %s not found\n", word);
+	} while(current->next != end);
 	return current;
 }

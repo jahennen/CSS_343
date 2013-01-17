@@ -36,7 +36,7 @@ ListNode* next(ListNode* current) {
 
 // Print current node and advance.
 ListNode* print(ListNode* current) {
-	printf("%s",current->data);
+	printf("%7d %s\n", current->count, current->data);
 	return current->next;
 }
 
@@ -56,7 +56,7 @@ void dump_list(ListNode* current) {
 	ListNode* end = current;
 	fprintf(stderr,"List is as follows:\n");
 	do {
-		fprintf(stderr,"%d %s\n", current->count, current->data);
+		fprintf(stderr,"%7d %s\n", current->count, current->data);
 		current = current->next;
 	} while (current != end);
 }

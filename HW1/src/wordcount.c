@@ -41,7 +41,11 @@ int main() {
 		}
 		//printf("\n");
 	}
-	dump_list(current);
+	ListNode * end = current;
+	do {
+		current = print(current);
+
+	} while (current != end);
     return 0;
 }
 
@@ -57,7 +61,7 @@ ListNode* increment(ListNode* current, char* word) {
 	if (strcmp(current->next->data, word) == 0) { //word was found, increment count
 		current->next->count++;
 	} else {							  //word not found, append new entry
-		ListNode* temp = append(current, word);
+		append(current, word);
 	}
 	return current;
 }

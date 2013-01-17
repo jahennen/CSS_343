@@ -2,14 +2,14 @@
 
 # default target
 words: allocator.o list.o wordcount.o
-	gcc -Wall -g -o words allocator.o list.o wordcount.o
+	g++ -Wall -g -o ./build/wordcount allocator.o list.o wordcount.o
 
 # individual source files
-allocator.o: allocator.c allocator.h
-	gcc -Wall -g -c allocator.c
+allocator.o: allocator.cpp allocator.h
+	g++ -Wall -g -c allocator.cpp
 
-list.o: list.c list.h allocator.h
-	gcc -Wall -g -c list.c
+list.o: list.cpp list.h allocator.h
+	g++ -Wall -g -c list.cpp
 
-wordcount.o: wordcount.c 
-	gcc -Wall -g -c wordcount.c
+wordcount.o: wordcount.cpp
+	g++ -Wall -g -c wordcount.cpp

@@ -9,15 +9,7 @@
 #include "allocator.h"
 #include <stdlib.h>
 
-struct ListNode {
-	struct ListNode* next;
-	int count;
-	char data[0];
-};
-
-typedef struct ListNode ListNode;
-
-
+struct ListNode;
 
 // Add new node after current and return new node.
 ListNode* append(ListNode* current, char * data);

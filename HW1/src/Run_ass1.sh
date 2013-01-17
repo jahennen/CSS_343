@@ -15,7 +15,6 @@ rm -f wordcount
 mkdir -p build out
 
 # Shell variables to make changes easier
-SOURCES="*.cc"
 PROGRAM=wordcount
 
 # Build the program.  Since it's trivial, we don't need the overhead
@@ -23,21 +22,21 @@ PROGRAM=wordcount
 # Note the flags will put the program and the temporaries into the
 # build subdirectory.  Check to make sure something was built before
 # continuing.
-g++ -v --save-temps=obj -o build/${PROGRAM} ${SOURCES}
+make
 [ -x build/${PROGRAM} ] || ( echo "Build failed" ; exit 1 )
-mv out/${PROGRAM} .
+mv build/${PROGRAM} .
 
 # Run wordcount on each input file.  This assumes the input files
 # have the .data extension and are in the current directory.  Other
 # conventions are equally valid (e.g. putting all the data in a
 # subdirectory).
-DATA=*.data
+DATA=../tests/*.txt
 for data in ${DATA}; do
     # Construct $out and $err variables by subsituting the extension
     # and adding a directory prefix.  e.g. foo.data becomes
     # out/foo.out and out/foo.err
-    out=out/`basename data .data`.out
-    err=out/`basename data .data`.err
+    out=out/`basename $data .txt`.out
+    err=out/`basename $data .txt`.err
     ./${PROGRAM} < ${data} > ${out} 2> ${err}
     [ $? ] || (echo "test run on ${data} failed" ; exit 1)
     # Uncomment this if you have baseline files to compare output.

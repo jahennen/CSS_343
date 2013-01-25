@@ -1,7 +1,7 @@
 /*
  * CSS 343 HW1
  * Jay Hennen
- * allocator.c
+ * allocator.cpp
  * 1/17/2013
  */
 
@@ -9,7 +9,7 @@
 
 char Arena[ARENA_SIZE];
 
-// A requested block
+// A request smaller than PAD_SIZE may be satisfied by a block of size PAD_SIZE
 #define PAD_SIZE 32
 
 // Define the node header
@@ -61,7 +61,7 @@ void* allocate(size_t request) {
 		//printf("%p\n",current);
 	    // the next block in freelist is within PAD_SIZE of request, return pointer to it
 	    if (current->next && (current->next->size-request<=PAD_SIZE)) {
-	      void * mem = (void*)current->next + hdr;
+	      void * mem = (void*)(current->next + hdr);
 	      current->next = current->next->next;
 	      return mem;
 	    }
@@ -136,6 +136,6 @@ void* cutnode(struct Free_node * current, size_t request) {
   node->size = request;
   current->size -= request + sizeof(Free_node);
   // create pointer to new node, header bytes offset from node
-  void * mem = (void*)node + sizeof(Free_node);
+  void * mem = (void*)(node + sizeof(Free_node));
   return mem;
 }

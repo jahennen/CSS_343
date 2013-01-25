@@ -1,7 +1,7 @@
 /*
   CSS 343 HW1
   Jay Hennen
-  wordcount.c
+  wordcount.cpp
   1/17/2013
 */
 

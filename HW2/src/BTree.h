@@ -10,9 +10,34 @@
 
 #include <cstdlib>
 #include <iostream>
-#include "TreeNode.h"
 
 using namespace std;
+
+template <typename T>
+class BTree;
+
+template <typename T>
+class TreeNode {
+	friend class BTree<T>;
+public:
+	TreeNode();
+private:
+	T* key1;
+	T* key2;
+	TreeNode* left; //pointer to left child node of node
+	TreeNode* mid; //pointer to right child node of node
+	TreeNode* right; //pointer to right child node of node
+};
+
+template <typename T>
+TreeNode<T>::TreeNode()
+{
+	key1 = NULL;
+	key2 = NULL;
+	left = NULL;
+	mid  = NULL;
+	right = NULL;
+}
 
 template <typename T>
 class BTree {
@@ -24,14 +49,17 @@ public:
 	T* lookup(T* item);
 	bool is_empty();
 	void dump_tree();
-	//void walk(F f);
+	template <typename F>
+	void walk(F f);
 private:
 	TreeNode<T>* root;
 	TreeNode<T>* re_lookup(T* item, TreeNode<T> * current);
 	TreeNode<T>* recursive_insert(T* item, TreeNode<T> * current);
 	TreeNode<T>* recursive_remove(T* item, TreeNode<T> * current);
-	TreeNode<T>* find_parent(T* item, TreeNode<T> *current, TreeNode<T> * child);
-	void fix(TreeNode<T>* item, TreeNode<T>* hole);
+	TreeNode<T>* find_parent(T* item, TreeNode<T> * current, TreeNode<T> * child);
+	template <typename F>
+	void re_walk(F f, TreeNode<T> * current);
+	void fix(TreeNode<T>* item, TreeNode<T> * hole);
 };
 
 template <typename T>
@@ -41,12 +69,43 @@ BTree<T>::BTree() {
 
 template <typename T>
 BTree<T>::~BTree() {
+
 	// TODO Auto-generated destructor stub
 }
 
 template <typename T>
 bool BTree<T>::is_empty() {
 	return root == NULL;
+}
+
+
+template <typename T>
+TreeNode<T>* BTree<T>::re_lookup(T* item, TreeNode<T> * current) {
+	if (current == NULL)
+		return NULL;
+	if (!(*item < *current->key1)&&!(*current->key1 < *item))
+		return current;
+	if (current->key2 && !(*item < *current->key2)&&!(*current->key2 < *item))
+		return current;
+	if (*item < *current->key1)
+		return re_lookup(item, current->left);
+	else if (current->key2 && *current->key2 < *item)
+		return re_lookup(item, current->right);
+	else
+		return re_lookup(item, current->mid);
+}
+
+
+template <typename T>
+T* BTree<T>::lookup(T* item) {
+	TreeNode<T>* result = re_lookup(item, root);
+	if (result) {
+		if (!(*item < *result->key1)&&!(*result->key1 < *item))
+			return result->key1;
+		if (result->key2 && !(*item < *result->key2)&&!(*result->key2 < *item))
+			return result->key2;
+	}
+	return NULL;
 }
 
 template <typename T>
@@ -357,7 +416,7 @@ T* BTree<T>::remove(T* item) {
 	}
 	if (location->left) {	// deleting from a branch node, find immediate predecessor
 		TreeNode<T>* pred;
-		if (location->key2 && !*item < *location->key2 && !*location->key2 < *item ) { // remove location->key2
+		if (location->key2 && !(*item < *location->key2) && !(*location->key2 < *item) ) { // remove location->key2
 			pred = location->mid;
 		} else {	// remove location->key1
 			pred = location->left;
@@ -371,7 +430,7 @@ T* BTree<T>::remove(T* item) {
 		}
 		parent = find_parent(pred->key1, root, pred);
 		if (pred->key2) {
-			if (!*item < *pred->key2 && !*pred->key2 < *item ){
+			if (!(*item < *pred->key2) && !(*pred->key2 < *item) ){
 				pred->key2 = NULL;
 			} else {
 				pred->key1 = pred->key2;
@@ -384,7 +443,7 @@ T* BTree<T>::remove(T* item) {
 	} else { // Removing from a leaf
 		parent = find_parent(item, root, location);
 		if (location->key2) {
-			if (!*item < *location->key2 && !*location->key2 < *item ){
+			if (!(*item < *location->key2) && !(*location->key2 < *item) ){
 				location->key2 = NULL;
 			} else {
 				location->key1 = location->key2;
@@ -399,35 +458,32 @@ T* BTree<T>::remove(T* item) {
 	if (hole) {
 		fix(parent, hole);
 	}
-
+	return item;
 }
 
 template <typename T>
-TreeNode<T>* BTree<T>::re_lookup(T* item, TreeNode<T> * current) {
-	if (current == NULL)
-		return NULL;
-	if (!(*item < *current->key1)&&!(*current->key1 < *item))
-		return current;
-	if (current->key2 && !(*item < *current->key2)&&!(*current->key2 < *item))
-		return current;
-	if (*item < *current->key1)
-		return re_lookup(item, current->left);
-	else if (current->key2 && *current->key2 < *item)
-		return re_lookup(item, current->right);
-	else
-		return re_lookup(item, current->mid);
-}
-
-template <typename T>
-T* BTree<T>::lookup(T* item) {
-	TreeNode<T>* result = re_lookup(item, root);
-	if (result) {
-		if (!(*item < *result->key1)&&!(*result->key1 < *item))
-			return result->key1;
-		if (result->key2 && !(*item < *result->key2)&&!(*result->key2 < *item))
-			return result->key2;
+template <typename F>
+void BTree<T>::re_walk(F f, TreeNode<T> * current) {
+	if (!current->left) { //base case, leaf node
+		f(current->key1);
+		if (current->key2) {
+			f(current->key2);
+		}
+	} else { // recursive case, process inorder
+		re_walk(f, current->left);
+		f(current->key1);
+		re_walk(f, current->mid);
+		if (current->key2) {
+			f(current->key2);
+			re_walk(f, current->right);
+		}
 	}
-	return NULL;
+}
+
+template <typename T>
+template <typename F>
+void BTree<T>::walk(F f) { // does an inorder walk of the tree
+	re_walk(f, root);
 }
 
 #endif /* BTREE_H_ */

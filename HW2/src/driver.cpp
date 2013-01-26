@@ -8,7 +8,7 @@
 #include <iostream>
 #include "BTree.h"
 
-#define SIZE 10000
+#define SIZE 10
 
 int main() {
 	BTree<int> tree;
@@ -28,18 +28,19 @@ int main() {
 
 	int* p = a;
 	for( i = 0; i < SIZE; i++) {
-		cout << "Inserting: " << p[i] << "\n";
+		cout << "Inserting: " << *(p+i) << "\n";
 		tree.insert(p+i);
 	}
 
 	cout << "SUCCESSFUL INSERT\n";
 
-	for( i = 0; i < SIZE; i++) {
-		cout << "Deleting: " << p[i] << "\n";
+	for( i = SIZE-1; i >= 0; i--) {
+		cout << "Deleting: " << *(p+i) << "\n";
 			tree.remove(p+i);
 	}
 
 	cout << "SUCCESSFUL DELETE\n";
+	delete[] a;
 	return 0;
 }
 

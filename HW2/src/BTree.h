@@ -31,6 +31,7 @@ private:
 	TreeNode<T>* recursive_insert(T* item, TreeNode<T> * current);
 	TreeNode<T>* recursive_remove(T* item, TreeNode<T> * current);
 	TreeNode<T>* find_parent(T* item, TreeNode<T> *current, TreeNode<T> * child);
+	void fix(TreeNode<T>* item, TreeNode<T>* hole);
 };
 
 template <typename T>
@@ -96,7 +97,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 					l->left = result->left;
 					l->mid = result->mid;
 					r->left = current->mid;
-					r->mid = result->right;
+					r->mid = current->right;
 				} else { // Node is not full
 					current->key2 = current->key1;
 					current->key1 = result->key1;
@@ -167,6 +168,9 @@ T* BTree<T>::insert(T* item) {
 
 template <typename T>
 TreeNode<T>* BTree<T>::find_parent(T* item, TreeNode<T> * current, TreeNode<T> * child) {
+	if (current == child) {
+		return NULL;
+	}
 	if (current->left == child || current->mid == child ||
 			(current->right && current->right == child)) {	//base case, this node is parent
 		return current;
@@ -181,13 +185,176 @@ TreeNode<T>* BTree<T>::find_parent(T* item, TreeNode<T> * current, TreeNode<T> *
 }
 
 template <typename T>
+void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
+	if (hole == root) {
+		root = hole->left; //TEMPORARY
+		delete(hole);
+	} else {
+		TreeNode<T>* lc = parent->left;  //left child
+		TreeNode<T>* mc = parent->mid;	 //mid child
+		TreeNode<T>* rc = parent->right; //right child
+		if (parent->key2) { // parent has 2 keys, therefore 3 children
+			if(lc == hole) { // hole is left
+				if (mc->key2) { // hole is left node, middle is full
+					//rearrange keys
+					lc->key1 = parent->key1;
+					parent->key1 = mc->key1;
+					mc->key1 = mc->key2;
+					mc->key2 = NULL;
+					//shift ptrs
+					lc->mid = mc->left;
+					mc->left = mc->mid;
+					mc->mid = mc->right;
+					mc->right = NULL;
+				} else if (rc->key2){ //hole is left, middle sibling has 1 key, right full
+					//rearrange keys
+					lc->key1 = parent->key1;
+					parent->key1 = mc->key1;
+					mc->key1 = parent->key2;
+					parent->key2 = rc->key1;
+					rc->key1 = rc->key2;
+					rc->key2 = NULL;
+					//shift ptrs
+					lc->mid = mc->left;
+					mc->left = mc->mid;
+					mc->mid = rc->left;
+					rc->left = rc->mid;
+					rc->mid = rc->right;
+					rc->right = NULL;
+				} else { // hole is left, mid, right have 1 key
+					// earrange keys
+					lc->key1 = parent->key1;
+					lc->key2 = mc->key1;
+					parent->key1 = parent->key2;
+					parent->key2 = NULL;
+					// shift ptrs
+					lc->mid = mc->left;
+					lc->right = mc->mid;
+
+					delete(parent->mid);
+					parent->mid = parent->right;
+					parent->right = NULL;
+				}
+				return;
+			} else if (mc == hole) { // hole is mid
+				if (rc->key2) { // hole is mid, right full
+					//rearrange keys
+					mc->key1 = parent->key2;
+					parent->key2 = rc->key1;
+					rc->key1 = rc->key2;
+					rc->key2 = NULL;
+					//shift ptrs
+					mc->mid = rc->left;
+					rc->left = rc->mid;
+					rc->mid = rc->right;
+					rc->right = NULL;
+				} else if (lc->key2) { //hole is mid, left is full, right has 1
+					//rearrange keys
+					mc->key1 = parent->key1;
+					parent->key1 = lc->key2;
+					lc->key2 = NULL;
+					//shift ptrs
+					mc->mid = mc->left;
+					mc->left = lc->right;
+					lc->right = NULL;
+				} else { //hole is mid, left has 1, right has 1
+					//rearrange keys
+					lc->key2 = parent->key1;
+					parent->key1 = parent->key2;
+					parent->key2 = NULL;
+					//shift ptrs
+					lc->right = mc->left;
+					delete(parent->mid);
+					parent->mid = parent->right;
+					parent->right = NULL;
+				}
+				return;
+			} else { // hole is right
+				if (mc->key2) { // hole is right, mid is full
+					//rearrange keys
+					rc->key1 = parent->key2;
+					parent->key2 = mc->key2;
+					mc->key2 = NULL;
+					//shift ptrs
+					rc->mid = rc->left;
+					rc->left = mc->right;
+					mc->right = NULL;
+				} else { // hole is right, mid has 1
+					//rearrange keys
+					mc->key2 = parent->key2;
+					parent->key2 = NULL;
+					//shift ptrs
+					mc->right = rc->left;
+					delete(parent->right);
+					parent->right = NULL;
+				}
+				return;
+			}
+
+		} else { // Parent has 1 key. Might need to push hole upwards
+			if(lc == hole) { // hole is left
+				if (mc->key2) { //hole is left, mid is full
+					//rearrange keys
+					lc->key1 = parent->key1;
+					parent->key1 = mc->key1;
+					mc->key1 = mc->key2;
+					mc->key2 = NULL;
+					//shift ptrs
+					lc->mid = mc->left;
+					mc->left = mc->mid;
+					mc->mid = mc->right;
+					mc->right = NULL;
+				} else { //hole is left, mid has 1
+					//rearrange keys
+					lc->key1 = parent->key1;
+					lc->key2 = mc->key1;
+					parent->key1 = NULL;
+					//shift ptrs
+					lc->mid = mc->left;
+					lc->right = mc->mid;
+					delete(parent->mid);
+					parent->mid = NULL; //Parent is new hole
+					fix(find_parent(lc->key1,root,parent), parent);
+				}
+			} else if (mc == hole) {
+				if (lc->key2) { // hole is mid, left is full
+					//rearrange keys
+					mc->key1 = parent->key1;
+					parent->key1 = lc->key2;
+					lc->key2 = NULL;
+					//shift ptrs
+					mc->mid = mc->left;
+					mc->left = lc->right;
+					lc->right = NULL;
+				} else {
+					//rearrange keys
+					lc->key2 = parent->key1;
+					parent->key1 = NULL;
+					//shift ptrs
+					lc->right = mc->left;
+					delete(parent->mid);
+					parent->mid = NULL; //Parent is new hole
+					fix(find_parent(lc->key1,root,parent), parent);
+				}
+			}
+		}
+	}
+	return;
+}
+
+template <typename T>
 T* BTree<T>::remove(T* item) {
 	if (!lookup(item)) {
 		return NULL;
 	}
-	TreeNode<T>* parent;
 	TreeNode<T>* hole = NULL;
-	TreeNode<T>* location = re_lookup(item, root);
+	TreeNode<T>* parent;
+	TreeNode<T>* location;
+	if (root->key1 == item || root->key2 == item) {
+		location = root;
+	} else {
+		location = re_lookup(item, root);
+	}
 	if (location->left) {	// deleting from a branch node, find immediate predecessor
 		TreeNode<T>* pred;
 		if (location->key2 && !*item < *location->key2 && !*location->key2 < *item ) { // remove location->key2
@@ -202,15 +369,20 @@ T* BTree<T>::remove(T* item) {
 				pred = pred->mid;
 			}
 		}
-		if (pred->key2) {	// pred has 2 keys, so give one up
-			location->key2 = pred->key2;
-			pred->key2 = NULL;
-		} else {	// pred only has one key, and is now a hole
-			location->key2 = pred->key1;
+		parent = find_parent(pred->key1, root, pred);
+		if (pred->key2) {
+			if (!*item < *pred->key2 && !*pred->key2 < *item ){
+				pred->key2 = NULL;
+			} else {
+				pred->key1 = pred->key2;
+				pred->key2 = NULL;
+			}
+		} else { //Removing will empty the leaf, creating a hole
 			pred->key1 = NULL;
+			hole = pred;
 		}
-		hole = pred;
 	} else { // Removing from a leaf
+		parent = find_parent(item, root, location);
 		if (location->key2) {
 			if (!*item < *location->key2 && !*location->key2 < *item ){
 				location->key2 = NULL;
@@ -225,7 +397,7 @@ T* BTree<T>::remove(T* item) {
 	}
 	// Okay, item has been deleted, now deal with the hole, if one was created
 	if (hole) {
-
+		fix(parent, hole);
 	}
 
 }

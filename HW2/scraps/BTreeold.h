@@ -30,10 +30,10 @@ public:
 	bool is_empty();
 	//void walk(F f);
 private:
-	TreeNode* root;
+	TreeNode<T>* root;
 	T* split_node(T* new_key, TreeNode * current);
 	T* re_lookup(T* item, TreeNode * current);
-	TreeNode* recursive_insert(T* item, TreeNode * current);
+	TreeNode<T>* recursive_insert(T* item, TreeNode * current);
 };
 
 #include "BTreeold.cpp.h"

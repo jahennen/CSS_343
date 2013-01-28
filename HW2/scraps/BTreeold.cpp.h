@@ -43,7 +43,7 @@ T* BTree<T>::split_node(T* new_key, TreeNode * current) {
 }
 
 template <class T>
-BTree<T>::TreeNode* BTree<T>::recursive_insert(T* item, TreeNode* current) {
+BTree<T>::TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode* current) {
 	//base case (leaf node)
 	if (!current->left && !current->mid && !current->right) {
 		//case 1 key space available
@@ -151,7 +151,7 @@ BTree<T>::TreeNode* BTree<T>::recursive_insert(T* item, TreeNode* current) {
 template <class T>
 T* BTree<T>::insert(T* item) {
 	if (is_empty()) {
-		root = new TreeNode;
+		root = new TreeNode<T>;
 		root->key1 = item;
 	} else {
 		recursive_insert(item, root);

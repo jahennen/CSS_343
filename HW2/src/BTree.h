@@ -168,13 +168,15 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 			}
 		}
 	} else {	// Recursive case, choose a path
-		TreeNode<T> * l = new TreeNode<T>;
-		TreeNode<T> * r = new TreeNode<T>;
+		TreeNode<T> * l;
+		TreeNode<T> * r;
 		TreeNode<T> * result;
 		if (*item < *current->key1) { // Left path
 			result = recursive_insert(item, current->left);
 			if (result != NULL) { // Uh oh, need to split?
 				if (current->key2) { //Node is full, split
+					l = new TreeNode<T>;
+					r = new TreeNode<T>;
 					l->key1 = result->key1;
 					r->key1 = current->key2;
 					l->left = result->left;
@@ -185,14 +187,17 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 					current->key2 = current->key1;
 					current->key1 = result->key1;
 					current->right = current->mid;
-					current->left = result->left;
 					current->mid = result->mid;
+					current->left = result->left;
+					delete result; //result has been merged
 					return NULL;
 				}
 			}
 		} else if (current->key2 && *current->key2 < *item) { // right path
 			result = recursive_insert(item, current->right);
 			if (result != NULL) { // Uh oh, need to split?
+				l = new TreeNode<T>;
+				r = new TreeNode<T>;
 				l->key1 = current->key1;
 				r->key1 = result->key1;
 				l->left = current->left;
@@ -205,6 +210,8 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 			result = recursive_insert(item, current->mid);
 			if (result != NULL) { // Uh oh, need to split?
 				if (current->key2) { //Node is full, split
+					l = new TreeNode<T>;
+					r = new TreeNode<T>;
 					l->key1 = current->key1;
 					r->key1 = current->key2;
 					l->left = current->left;
@@ -216,6 +223,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 					current->key2 = result->key1;
 					current->right = result->mid;
 					current->mid = result->left;
+					delete result; //result has been merged
 					return NULL;
 				}
 			}
@@ -225,6 +233,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 			current->left = l;
 			current->mid = r;
 			current->right = NULL;
+			delete result; //result has been merged
 			return current;
 		} else {
 			return NULL;
@@ -367,6 +376,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					parent->key2 = NULL;
 					//shift ptrs
 					mc->right = rc->left;
+					delete parent->right;
 					parent->right = NULL;
 				}
 				return;

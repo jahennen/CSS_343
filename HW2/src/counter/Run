@@ -1,0 +1,23 @@
+#! /bin/bash
+#
+# Copyright 2013 Systems Deployment, LLC
+# Author: Morris Bernstein
+
+set -o xtrace
+
+rm -f counter_test
+
+make clean && make test
+
+./counter_test 2> counter_test.out
+
+cmp counter_test.out counter_test.baseline
+RESULT="$?"
+
+if [ "${RESULT}" == 0 ] ; then
+  echo "SUCCESS"
+else
+  echo "FAILURE"
+fi
+
+exit $RESULT

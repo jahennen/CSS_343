@@ -20,7 +20,8 @@ using namespace std;
 class Strmap_printer {
 public:
 	void operator()(Strmap * s) {
-		printf("%7d %s\n", s->get_count(), s->get_word());
+		printf("%7d ", s->get_count());
+		cout << s->get_word() << "\n";
 	}
 };
 
@@ -30,7 +31,7 @@ int main() {
 	string in_buffer;
 	while(getline(cin, in_buffer)) {
 		char opt = in_buffer[OPT_LOC];
-		char* word = &in_buffer[STR_LOC];
+		string word = &in_buffer[STR_LOC];
 
 		if (in_buffer.length() < 3 || in_buffer[1] != ' ' ||
 				(opt != 'a'&& opt != 'd')) {

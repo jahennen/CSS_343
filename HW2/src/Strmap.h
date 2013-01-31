@@ -8,19 +8,21 @@
 #ifndef STRMAP_H_
 #define STRMAP_H_
 
-#include <cstring>
+#include <iostream>
+
+using namespace std;
 
 // This class maps one string to an int 'count'
 class Strmap {
 public:
-	Strmap(const char* s);
+	Strmap(string s);
 	~Strmap();
-	const char* get_word();
+	string get_word();
 	int get_count();
 	void set_count(int n);
 	bool operator<(const Strmap & rhs) const;
 private:
-	char * word;
+	string word;
 	int count;
 };
 

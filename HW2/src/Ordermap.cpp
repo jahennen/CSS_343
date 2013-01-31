@@ -7,9 +7,8 @@
 
 #include "Ordermap.h"
 
-Ordermap::Ordermap(int pos, const char * s) {
-	word = new char[strlen(s)];
-	strcpy(word, s);
+Ordermap::Ordermap(int pos, string s) {
+	word = s;
 	position = pos;
 }
 

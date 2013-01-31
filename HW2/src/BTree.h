@@ -52,6 +52,7 @@ public:
 	template <typename F>
 	void walk(F f);
 private:
+	void clean_up(TreeNode<T> * current);
 	TreeNode<T>* root;
 	TreeNode<T>* re_lookup(T* item, TreeNode<T> * current);
 	TreeNode<T>* recursive_insert(T* item, TreeNode<T> * current);
@@ -68,9 +69,29 @@ BTree<T>::BTree() {
 }
 
 template <typename T>
-BTree<T>::~BTree() {
+void BTree<T>::clean_up(TreeNode<T> * current) {
+	if (is_empty()) { // nothing to do
+		return;
+	}
+	if (!current->left) { //Leaf
+		delete current->key1;
+		if (current->key2)
+			delete current->key2 ;
+	} else {
+		clean_up(current->left);
+		delete current->left;
+		delete current->key1;
+		clean_up(current->mid);
+		if (current->key2) {
+			delete current->key2;
+			clean_up(current->right);
+		}
+	}
+}
 
-	// TODO Auto-generated destructor stub
+template <typename T>
+BTree<T>::~BTree() {
+	clean_up(root);
 }
 
 template <typename T>
@@ -289,7 +310,6 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					// shift ptrs
 					lc->mid = mc->left;
 					lc->right = mc->mid;
-
 					delete(parent->mid);
 					parent->mid = parent->right;
 					parent->right = NULL;
@@ -344,7 +364,6 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					parent->key2 = NULL;
 					//shift ptrs
 					mc->right = rc->left;
-					delete(parent->right);
 					parent->right = NULL;
 				}
 				return;
@@ -409,7 +428,9 @@ T* BTree<T>::remove(T* item) {
 	TreeNode<T>* hole = NULL;
 	TreeNode<T>* parent;
 	TreeNode<T>* location;
-	if (root->key1 == item || root->key2 == item) {
+	//if (root->key1 == item || root->key2 == item) {
+	if ((!(*item < *root->key1) && !(*root->key1 < *item)) ||
+			(root->key2 && !(*item < *root->key1) && !(*root->key1 < *item))) {
 		location = root;
 	} else {
 		location = re_lookup(item, root);
@@ -429,17 +450,38 @@ T* BTree<T>::remove(T* item) {
 			}
 		}
 		parent = find_parent(pred->key1, root, pred);
-		if (pred->key2) {
-			if (!(*item < *pred->key2) && !(*pred->key2 < *item) ){
-				pred->key2 = NULL;
-			} else {
-				pred->key1 = pred->key2;
-				pred->key2 = NULL;
+		if (location->key2 && !(*item < *location->key2) && !(*location->key2 < *item) ) { // remove location->key2
+			if (pred->key2) {
+				if (!(*item < *pred->key2) && !(*pred->key2 < *item) ){
+					location->key2 = pred->key2;
+					pred->key2 = NULL;
+				} else {
+					location->key2 = pred->key1;
+					pred->key1 = pred->key2;
+					pred->key2 = NULL;
+				}
+			} else { //Removing will empty the leaf, creating a hole
+				location->key2 = pred->key1;
+				pred->key1 = NULL;
+				hole = pred;
 			}
-		} else { //Removing will empty the leaf, creating a hole
-			pred->key1 = NULL;
-			hole = pred;
+		} else {	// remove location->key1
+			if (pred->key2) {
+				if (!(*item < *pred->key2) && !(*pred->key2 < *item) ){
+					location->key1 = pred->key2;
+					pred->key2 = NULL;
+				} else {
+					location->key1 = pred->key1;
+					pred->key1 = pred->key2;
+					pred->key2 = NULL;
+				}
+			} else { //Removing will empty t=he leaf, creating a hole
+				location->key1 = pred->key1;
+				pred->key1 = NULL;
+				hole = pred;
+			}
 		}
+
 	} else { // Removing from a leaf
 		parent = find_parent(item, root, location);
 		if (location->key2) {

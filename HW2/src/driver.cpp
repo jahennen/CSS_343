@@ -8,7 +8,7 @@
 #include <iostream>
 #include "BTree.h"
 
-#define SIZE 10
+#define SIZE 100
 
 int main() {
 	BTree<int> tree;

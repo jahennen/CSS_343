@@ -1,23 +1,30 @@
 #include <iostream>
-#include <cstdio>
 #include <cstring>
-#include <queue>
 #include "BTree.h"
-
-#define OPT_LOC 0	//option index in input string
-#define STR_LOC 2	//string begin index in input string
 
 using namespace std;
 
+class deleter {
+public:
+	void operator()(string * ptr) {
+		delete ptr;
+	}
+};
+
 int main() {
 	BTree<string> set_tree;
-
 	string line;
 	while(getline(cin, line)) {
-		if (!set_tree.lookup(&line)) {
-			set_tree.insert(&line);
+		string * word = new string(line);
+		if (!set_tree.lookup(word)) {
+			set_tree.insert(word);
 			cout << line << "\n";
+		} else {
+			delete word;
 		}
 	}
+	deleter d;
+	set_tree.walk(d);
+
 	return 0;
 }

@@ -25,6 +25,13 @@ public:
 	}
 };
 
+class Strmap_deleter {
+public:
+	void operator()(Strmap * s) {
+		delete s;
+	}
+};
+
 int main() {
 	BTree<Strmap> tree;
 
@@ -43,6 +50,7 @@ int main() {
 			Strmap * res = tree.lookup(add);
 			if (res && !(*res < *add) && !(*add < *res)) { //Item already exists in tree, +1 count
 				res->set_count(res->get_count()+1);
+				delete add;
 			} else { // Item does not exist, add it
 				tree.insert(add);
 			}
@@ -56,6 +64,7 @@ int main() {
 					tree.remove(rem);
 				}
 			} else { // Item does not exist, exit failure
+				delete rem;
 				cerr << "Trying to decrement a word without an entry\n";
 				exit (EXIT_FAILURE);
 			}
@@ -63,5 +72,7 @@ int main() {
 	}
 	Strmap_printer p;
 	tree.walk(p);
+	Strmap_deleter d; // cleanup your mess
+	tree.walk(d);
 	return 0;
 }

@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include "counter/counter.h"
 
 using namespace std;
 
@@ -137,6 +138,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 	if (!current->left && !current->mid && !current->right) {	//base case (leaf node)
 		//case 1 key space available
 		if (current->key1 && !current->key2) {
+			Counter::increment("Insert open leaf",1);
 			if (*item < *current->key1) {
 				current->key2 = current->key1;
 				current->key1 = item;
@@ -146,6 +148,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 			return NULL;
 			//case 2 node is full, so split
 		} else {
+			Counter::increment("Insert full leaf",1);
 			current->left = new TreeNode<T>;
 			current->mid = new TreeNode<T>;
 			if (*item < *current->key1) {
@@ -175,6 +178,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 			result = recursive_insert(item, current->left);
 			if (result != NULL) { // Uh oh, need to split?
 				if (current->key2) { //Node is full, split
+					Counter::increment("Insert from left into full",1);
 					l = new TreeNode<T>;
 					r = new TreeNode<T>;
 					l->key1 = result->key1;
@@ -184,6 +188,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 					r->left = current->mid;
 					r->mid = current->right;
 				} else { // Node is not full
+					Counter::increment("Insert from left into open",1);
 					current->key2 = current->key1;
 					current->key1 = result->key1;
 					current->right = current->mid;
@@ -196,6 +201,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 		} else if (current->key2 && *current->key2 < *item) { // right path
 			result = recursive_insert(item, current->right);
 			if (result != NULL) { // Uh oh, need to split?
+				Counter::increment("Insert from right into full",1);
 				l = new TreeNode<T>;
 				r = new TreeNode<T>;
 				l->key1 = current->key1;
@@ -210,6 +216,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 			result = recursive_insert(item, current->mid);
 			if (result != NULL) { // Uh oh, need to split?
 				if (current->key2) { //Node is full, split
+					Counter::increment("Insert from mid into full",1);
 					l = new TreeNode<T>;
 					r = new TreeNode<T>;
 					l->key1 = current->key1;
@@ -220,6 +227,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 					r->mid = current->right;
 					current->key1 = result->key1;
 				} else { // Node is not full
+					Counter::increment("Insert from mid into open",1);
 					current->key2 = result->key1;
 					current->right = result->mid;
 					current->mid = result->left;
@@ -249,6 +257,7 @@ T* BTree<T>::insert(T* item) {
 		if (is_empty()) {
 			root = new TreeNode<T>;
 			root->key1 = item;
+			Counter::increment("Insert 1st element",1);
 		} else {
 			recursive_insert(item, root);
 		}
@@ -279,6 +288,7 @@ TreeNode<T>* BTree<T>::find_parent(T* item, TreeNode<T> * current, TreeNode<T> *
 template <typename T>
 void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 	if (hole == root) {
+		Counter::increment("Moved root from hole",1);
 		root = hole->left; //TEMPORARY
 		delete(hole);
 	} else {
@@ -288,6 +298,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 		if (parent->key2) { // parent has 2 keys, therefore 3 children
 			if(lc == hole) { // hole is left
 				if (mc->key2) { // hole is left node, middle is full
+					Counter::increment("Del parent full left hole mid full",1);
 					//rearrange keys
 					lc->key1 = parent->key1;
 					parent->key1 = mc->key1;
@@ -299,6 +310,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					mc->mid = mc->right;
 					mc->right = NULL;
 				} else if (rc->key2){ //hole is left, middle sibling has 1 key, right full
+					Counter::increment("Del parent full left hole mid open right full",1);
 					//rearrange keys
 					lc->key1 = parent->key1;
 					parent->key1 = mc->key1;
@@ -314,6 +326,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					rc->mid = rc->right;
 					rc->right = NULL;
 				} else { // hole is left, mid, right have 1 key
+					Counter::increment("Del parent full left hole mid open right open",1);
 					// earrange keys
 					lc->key1 = parent->key1;
 					lc->key2 = mc->key1;
@@ -329,6 +342,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 				return;
 			} else if (mc == hole) { // hole is mid
 				if (rc->key2) { // hole is mid, right full
+					Counter::increment("Del parent full mid hole right full",1);
 					//rearrange keys
 					mc->key1 = parent->key2;
 					parent->key2 = rc->key1;
@@ -340,6 +354,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					rc->mid = rc->right;
 					rc->right = NULL;
 				} else if (lc->key2) { //hole is mid, left is full, right has 1
+					Counter::increment("Del parent full mid hole left full right open",1);
 					//rearrange keys
 					mc->key1 = parent->key1;
 					parent->key1 = lc->key2;
@@ -349,6 +364,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					mc->left = lc->right;
 					lc->right = NULL;
 				} else { //hole is mid, left has 1, right has 1
+					Counter::increment("Del parent full mid hole left open right open",1);
 					//rearrange keys
 					lc->key2 = parent->key1;
 					parent->key1 = parent->key2;
@@ -362,6 +378,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 				return;
 			} else { // hole is right
 				if (mc->key2) { // hole is right, mid is full
+					Counter::increment("Del parent full right hole mid full",1);
 					//rearrange keys
 					rc->key1 = parent->key2;
 					parent->key2 = mc->key2;
@@ -371,6 +388,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					rc->left = mc->right;
 					mc->right = NULL;
 				} else { // hole is right, mid has 1
+					Counter::increment("Del parent full right hole mid open",1);
 					//rearrange keys
 					mc->key2 = parent->key2;
 					parent->key2 = NULL;
@@ -385,6 +403,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 		} else { // Parent has 1 key. Might need to push hole upwards
 			if(lc == hole) { // hole is left
 				if (mc->key2) { //hole is left, mid is full
+					Counter::increment("Del parent open left hole mid full",1);
 					//rearrange keys
 					lc->key1 = parent->key1;
 					parent->key1 = mc->key1;
@@ -396,6 +415,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					mc->mid = mc->right;
 					mc->right = NULL;
 				} else { //hole is left, mid has 1
+					Counter::increment("Del parent open left hole mid open",1);
 					//rearrange keys
 					lc->key1 = parent->key1;
 					lc->key2 = mc->key1;
@@ -409,6 +429,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 				}
 			} else if (mc == hole) {
 				if (lc->key2) { // hole is mid, left is full
+					Counter::increment("Del parent open mid hole left full",1);
 					//rearrange keys
 					mc->key1 = parent->key1;
 					parent->key1 = lc->key2;
@@ -417,7 +438,8 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					mc->mid = mc->left;
 					mc->left = lc->right;
 					lc->right = NULL;
-				} else {
+				} else { // hole is mid, left has 1
+					Counter::increment("Del parent open mid hole left open",1);
 					//rearrange keys
 					lc->key2 = parent->key1;
 					parent->key1 = NULL;
@@ -445,6 +467,7 @@ T* BTree<T>::remove(T* item) {
 	//if (root->key1 == item || root->key2 == item) {
 		location = re_lookup(item, root); // find the location to remove
 	if (location->left) {	// deleting from a branch node, find immediate predecessor
+		Counter::increment("Deleting from branch node",1);
 		TreeNode<T>* pred; // need the predecessor
 		if (location->key2 && !(*item < *location->key2) && !(*location->key2 < *item) ) { // remove location->key2
 			pred = location->mid;
@@ -483,6 +506,7 @@ T* BTree<T>::remove(T* item) {
 	} else { // Removing from a leaf
 		parent = find_parent(item, root, location);
 		if (location->key2) {
+			Counter::increment("Deleting from a full leaf",1);
 			if (!(*item < *location->key2) && !(*location->key2 < *item) ){
 				location->key2 = NULL;
 			} else {
@@ -490,6 +514,7 @@ T* BTree<T>::remove(T* item) {
 				location->key2 = NULL;
 			}
 		} else { //Removing will empty the leaf, creating a hole
+			Counter::increment("Deleting from an open leaf",1);
 			location->key1 = NULL;
 			hole = location;
 		}

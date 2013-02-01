@@ -4,6 +4,7 @@
 
 using namespace std;
 
+// Function object to clean up after the BTree
 class deleter {
 public:
 	void operator()(string * ptr) {

@@ -2,7 +2,9 @@
  * Strmap.h
  *
  *  Created on: Jan 26, 2013
- *      Author: jay
+ *      Author: Jay Hennen
+ *
+ *      This simple class maps a single string to an int counter
  */
 
 #ifndef STRMAP_H_

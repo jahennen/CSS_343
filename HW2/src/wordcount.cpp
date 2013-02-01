@@ -11,12 +11,12 @@
 #include "Strmap.h"
 #include "BTree.h"
 
-#define MAX_LEN 128
 #define OPT_LOC 0	//option index in input string
 #define STR_LOC 2	//string begin index in input string
 
 using namespace std;
 
+// Function object to print the Strmap objects
 class Strmap_printer {
 public:
 	void operator()(Strmap * s) {
@@ -25,6 +25,7 @@ public:
 	}
 };
 
+// Function object to clean up after the BTree
 class Strmap_deleter {
 public:
 	void operator()(Strmap * s) {

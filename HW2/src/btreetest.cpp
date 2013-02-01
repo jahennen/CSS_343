@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <cassert>
 #include "BTree.h"
 #include "counter/counter.h"
 
@@ -19,19 +20,11 @@ int main() {
 	for(i = 0; i < SIZE; i++) {
 		a[i] = rand()%(SIZE*4);
 	}
-//	a[0] = 10;
-//	a[1] = 5;
-//	a[2] = 1;
-//	a[3] = 9;
-//	a[4] = 6;
-//	a[5] = 7;
-//	a[6] = 8;
-
 
 	int* p = a;
 	// insert all items
 	for( i = 0; i < SIZE; i++) {
-		cout << "Inserting: " << *(p+i) << "\n";
+		//cout << "Inserting: " << *(p+i) << "\n";
 		tree.insert(p+i);
 	}
 
@@ -39,13 +32,22 @@ int main() {
 
 	// delete all items in reverse order
 	for( i = SIZE-1; i >= 0; i--) {
-		cout << "Deleting: " << *(p+i) << "\n";
-			tree.remove(p+i);
+		//cout << "Deleting: " << *(p+i) << "\n";
+		tree.remove(p+i);
 	}
 
-	cout << "SUCCESSFUL DELETE\n";
+	if (tree.is_empty()) {
+		cout << "SUCCESSFUL DELETE" << endl;
+	} else {
+		cout << "INCOMPLETE DELETION!!!!" << endl;
+	}
+	cout << endl;
 
 	Counter::dump(cout);
+
+	// Review the dump to ensure all paths were followed. There should be 15 deletion
+	// statements and 7 insertion statements
+
 	delete[] a;
 	return 0;
 }

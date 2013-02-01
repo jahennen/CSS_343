@@ -2,7 +2,7 @@
  * Strmap.cpp
  *
  *  Created on: Jan 26, 2013
- *      Author: jay
+ *      Author: Jay Hennen
  */
 
 #include "Strmap.h"

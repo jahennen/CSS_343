@@ -9,7 +9,7 @@ using namespace std;
 int main() {
 	PQueue<int> q;
 	int* a = new int[SIZE];
-		int i;
+		unsigned int i;
 		// fill array with random integers
 		for(i = 0; i < SIZE; i++) {
 			a[i] = rand()%(SIZE*4);
@@ -26,7 +26,7 @@ int main() {
 		while(!q.isEmpty()) {
 			result.push_back(q.pop());
 		}
-		int k;
+		unsigned int k;
 		for (k = 0; k < result.size(); k++) {
 			cout << " " << result[k];
 		}

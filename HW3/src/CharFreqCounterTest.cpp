@@ -1,3 +1,4 @@
+
 #include "PQueue.h"
 #include "HuffNode.h"
 #include "CharFreqCounter.h"
@@ -5,8 +6,6 @@
 #include <iostream>
 
 using namespace std;
-
-void preorderPrint(HuffNode current);
 
 int main() {
 	CharFreqCounter counts;
@@ -25,23 +24,14 @@ int main() {
 	counts.print();
 
 	PQueue<HuffNode> queue;
-	// Use conversion object to transform CharFreqCounter elements into HuffNodes,
-	// and insert them into the queue
 	CounterToHuffNodePQ converter(&counts, &queue);
 
-	while (queue.size() > 1) {
-		HuffNode * node1 = new HuffNode(queue.pop());
-		HuffNode * node2 = new HuffNode(queue.pop());
-		HuffNode newNode(node1->getCount()+node2->getCount(), node1, node2);
-		queue.push(newNode);
+	while (!queue.isEmpty()) {
+		HuffNode top = queue.pop();
+		cout << top.getChar() << " " << top.getCount() << endl;
 	}
-	HuffNode root = queue.pop();
 
 	return 0;
 }
 
-void preorderPrint(HuffNode current) {
-//	if (current) {
-//		cout << current.g
-//	}
-}
+

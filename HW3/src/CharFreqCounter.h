@@ -10,17 +10,37 @@
 
 #include <vector>
 #include "CharIntMap.h"
+#include "BTree.h"
 
 using namespace std;
+
+class deleter{
+public:
+	void operator()(CharIntMap * k){
+		delete k;
+	}
+};
+
+class printer{
+public:
+	void operator()(CharIntMap * k){
+		cout << k->getChar() << "  " << k->getCount() << endl;
+	}
+};
 
 class CharFreqCounter {
 public:
 	CharFreqCounter();
-	virtual ~CharFreqCounter();
-	void add(char c);
+	~CharFreqCounter();
+	void addCount(char c);
+	int lookup(char c);
 	void increment(char c);
+	void print();
+	template <typename F>
+	void walk(F f)  {
+		counts.walk(f);
+	}
 private:
-	vector<CharIntMap> data;
 	BTree<CharIntMap> counts;
 };
 #endif /* CHARFREQCOUNTER_H_ */

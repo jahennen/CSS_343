@@ -1,0 +1,18 @@
+# Makefile for assignment 2
+# Author: Jay Hennen
+# Not very useful except to elimiate typing
+
+CFLAGS = -Wall -g -o
+
+SUPPORT_FILES = CharIntMap.cpp CharFreqCounter.cpp HuffNode.cpp CounterToHuffNodePQ.cpp PQueue.h PQueue_impl.h BTree.h
+SUPPORT_CPP = CharIntMap.cpp CharFreqCounter.cpp HuffNode.cpp CounterToHuffNodePQ.cpp 
+
+# targets
+pqtest: PQTest.cpp PQueue_impl.h PQueue.h
+	g++ $(CFLAGS) ./build/pqtest PQTest.cpp
+
+charfreqtest: CharFreqCounterTest.cpp $(SUPPORT_FILES)
+	g++ $(CFLAGS) ./build/charfreqtest CharFreqCounterTest.cpp $(SUPPORT_CPP)
+
+huffcodec: HuffCodec.cpp $(SUPPORT_FILES)
+	g++ $(CFLAGS) ./build/huffcodec HuffCodec.cpp $(SUPPORT_CPP)

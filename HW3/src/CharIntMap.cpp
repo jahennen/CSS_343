@@ -12,7 +12,8 @@ CharIntMap::CharIntMap(char newChar) {
 	count = 1;
 }
 
-CharIntMap::~CharIntMap() {}
+CharIntMap::~CharIntMap() {
+}
 
 // Increments count by i
 void CharIntMap::increment(int i) {

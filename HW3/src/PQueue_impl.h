@@ -13,7 +13,7 @@
 
 template <typename T>
 PQueue<T>::PQueue() {
-	data.push_back(numeric_limits<int>::min());
+	data.push_back(T());
 	end = 1;
 }
 
@@ -70,6 +70,7 @@ T PQueue<T>::pop() {
 	T item = data[1];
 	data[1] = data[end-1];
 	end--;
+	data.pop_back();
 	int loc = 1;
 	while ((2*loc < end) && ((data[2*loc] < data[loc]) || data[2*loc+1] < data[loc])) {
 		if (data[2*loc] < data[loc] && data[2*loc+1] < data[loc]) { // both child smaller than parent

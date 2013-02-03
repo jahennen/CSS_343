@@ -542,6 +542,9 @@ T* BTree<T>::remove(T* item) {
 template <typename T>
 template <typename F>
 void BTree<T>::re_walk(F f, TreeNode<T> * current) {
+	if (is_empty()) {
+		return;
+	}
 	if (!current->left) { // base case, leaf node
 		f(current->key1);
 		if (current->key2) {

@@ -15,6 +15,7 @@ public:
 	void increment(int i);
 	char getChar();
 	int getCount();
+	void print();
 	bool operator<(const CharIntMap & rhs) const;
 private:
 	char c;

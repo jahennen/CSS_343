@@ -9,10 +9,11 @@
 #define PQUEUE_IMPL_H_
 #include "PQueue.h"
 #include <iostream>
+#include <limits>
 
 template <typename T>
 PQueue<T>::PQueue() {
-	data(10);
+	data.push_back(numeric_limits<int>::min());
 	end = 1;
 }
 
@@ -29,35 +30,67 @@ int PQueue<T>::size() {
 }
 
 template <typename T>
-T* PQueue<T>::top() {
-	return &data[1];
+T PQueue<T>::top() {
+	return data[1];
 }
 
 template <typename T>
 void PQueue<T>::push(T &item) {
 	if (isEmpty()) {
-		cout << data[1] << "\n";
-		//data[1] = item;
+		data.push_back(item);
 		end++;
+		return;
 	}
-//	data[end] = item;
-//	if (data[end] < data[end/2]) {
-//		int loc = end;
-//		while (data[loc] < data[loc/2]) { // bubble up!
-//			T temp = data[loc];
-//			data[loc] = data[loc/2];
-//			data[loc/2] = temp;
-//			loc /= 2;
-//		}
-//	}
-	return ;
+	data.push_back(item);
+	if (data[end] < data[end/2]) {
+		int loc = end;
+		while (data[loc] < data[loc/2]) { // bubble up!
+			T temp = data[loc];
+			data[loc] = data[loc/2];
+			data[loc/2] = temp;
+			loc /= 2;
+		}
+	}
+	end++;
 }
 
 template <typename T>
-T* PQueue<T>::pop() {
+void PQueue<T>::swap(int i1, int i2) {
+	T temp = data[i1];
+	data[i1] = data[i2];
+	data[i2] = temp;
+}
+
+template <typename T>
+T PQueue<T>::pop() {
 	if (isEmpty()) {
+		cerr << "Queue empty" << endl;
+		return NULL;
 	}
-	T* item = data[1];
+	T item = data[1];
+	data[1] = data[end-1];
+	end--;
+	int loc = 1;
+	while ((2*loc < end) && ((data[2*loc] < data[loc]) || data[2*loc+1] < data[loc])) {
+		if (data[2*loc] < data[loc] && data[2*loc+1] < data[loc]) { // both child smaller than parent
+			if(data[2*loc] < data[2*loc+1]) { // left child < right child
+				swap(loc, 2*loc);
+				loc *= 2;
+			} else {
+				swap(loc, 2*loc+1);
+				loc = 2*loc+1;
+			}
+		} else {
+			if (data[2*loc] < data[loc]) {
+				swap(loc, 2*loc);
+				loc *= 2;
+			} else if (data[2*loc+1] < data[loc]) {
+				swap(loc, 2*loc+1);
+				loc = 2*loc+1;
+			}
+		}
+	}
+	return item;
 }
 
 #endif /* PQUEUE_IMPL_H_ */

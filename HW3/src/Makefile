@@ -16,3 +16,9 @@ charfreqtest: CharFreqCounterTest.cpp $(SUPPORT_FILES)
 
 huffcodec: HuffCodec.cpp $(SUPPORT_FILES)
 	g++ $(CFLAGS) ./build/huffcodec HuffCodec.cpp $(SUPPORT_CPP)
+	
+btreetest: BTreeTest.cpp BTree.h
+	g++ $(CFLAGS) ./build/btreetest BTreeTest.cpp
+	
+btmaptest: BTreeMapTest.cpp BTree.h BTreeMap.h
+	g++ $(CFLAGS) ./build/btmaptest BTreeMapTest.cpp

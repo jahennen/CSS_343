@@ -9,6 +9,7 @@
 #define HUFFTREE_H_
 
 #include <cstdlib>
+#include <iostream>
 #include "CharIntMap.h"
 
 using namespace std;
@@ -22,11 +23,12 @@ public:
 	char getChar();
 	int getCount();
 	bool operator<(const HuffNode & rhs) const;
-private:
 	char c;
 	int count;
 	HuffNode * left;
 	HuffNode * right;
+private:
+
 };
 
 #endif /* HUFFTREE_H_ */

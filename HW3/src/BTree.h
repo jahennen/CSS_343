@@ -1,13 +1,11 @@
 /*
- * BTree.h
+ * BTree.h version 1.1
  *
  *  Created on: Jan 20, 2013
  *      Author: Jay Hennen
  *
- *      This is an implementation of the 2-3 Tree data structure. It is important
- *      to note that this implementation does NOT directly own the *item objects
- *      assigned to it, and you WILL need to clean these objects up if no other reference
- *      to them exists before destroying the tree or you will suffer a memory leak
+ *      This is an implementation of the 2-3 Tree data structure. This updated version
+ *      DOES control all it's own memory
  */
 
 #ifndef BTREE_H_
@@ -53,19 +51,19 @@ class BTree {
 public:
 	BTree();
 	~BTree();
-	T* insert(T* item);
-	T* remove(T* item);
-	T* lookup(T* item);
+	bool insert(T& item);
+	bool remove(T& item);
+	T* lookup(T& item);
 	bool is_empty();
 	template <typename F>
 	void walk(F f);
 private:
 	void clean_up(TreeNode<T> * current);
 	TreeNode<T>* root;
-	TreeNode<T>* re_lookup(T* item, TreeNode<T> * current);
-	TreeNode<T>* recursive_insert(T* item, TreeNode<T> * current);
-	TreeNode<T>* recursive_remove(T* item, TreeNode<T> * current);
-	TreeNode<T>* find_parent(T* item, TreeNode<T> * current, TreeNode<T> * child);
+	TreeNode<T>* re_lookup(T& item, TreeNode<T> * current);
+	TreeNode<T>* recursive_insert(T& item, TreeNode<T> * current);
+	TreeNode<T>* recursive_remove(T& item, TreeNode<T> * current);
+	TreeNode<T>* find_parent(T& item, TreeNode<T> * current, TreeNode<T> * child);
 	template <typename F>
 	void re_walk(F f, TreeNode<T> * current);
 	void fix(TreeNode<T>* item, TreeNode<T> * hole);
@@ -113,16 +111,16 @@ bool BTree<T>::is_empty() {
 
 // Recursive lookup helper. Finds the TreeNode where the item is held
 template <typename T>
-TreeNode<T>* BTree<T>::re_lookup(T* item, TreeNode<T> * current) {
+TreeNode<T>* BTree<T>::re_lookup(T& item, TreeNode<T> * current) {
 	if (current == NULL)
 		return NULL;
-	if (!(*item < *current->key1)&&!(*current->key1 < *item))
+	if (!(item < *current->key1)&&!(*current->key1 < item))
 		return current;
-	if (current->key2 && !(*item < *current->key2)&&!(*current->key2 < *item))
+	if (current->key2 && !(item < *current->key2)&&!(*current->key2 < item))
 		return current;
-	if (*item < *current->key1)
+	if (item < *current->key1)
 		return re_lookup(item, current->left);
-	else if (current->key2 && *current->key2 < *item)
+	else if (current->key2 && *current->key2 < item)
 		return re_lookup(item, current->right);
 	else
 		return re_lookup(item, current->mid);
@@ -131,12 +129,12 @@ TreeNode<T>* BTree<T>::re_lookup(T* item, TreeNode<T> * current) {
 // Checks the item against the keys in the node returned by re_lookup and returns
 // the correct one
 template <typename T>
-T* BTree<T>::lookup(T* item) {
+T* BTree<T>::lookup(T& item) {
 	TreeNode<T>* result = re_lookup(item, root);
 	if (result) {
-		if (!(*item < *result->key1)&&!(*result->key1 < *item))
+		if (!(item < *result->key1)&&!(*result->key1 < item))
 			return result->key1;
-		if (result->key2 && !(*item < *result->key2)&&!(*result->key2 < *item))
+		if (result->key2 && !(item < *result->key2)&&!(*result->key2 < item))
 			return result->key2;
 	}
 	return NULL;
@@ -144,30 +142,30 @@ T* BTree<T>::lookup(T* item) {
 
 // Recursive insert helper
 template <typename T>
-TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
+TreeNode<T>* BTree<T>::recursive_insert(T & item, TreeNode<T>* current) {
 	if (!current->left && !current->mid && !current->right) {	//base case (leaf node)
 		// case 1 key space available
 		if (current->key1 && !current->key2) {
 			//Counter::increment("Insert open leaf",1);
-			if (*item < *current->key1) {
+			if (item < *current->key1) {
 				current->key2 = current->key1;
-				current->key1 = item;
+				current->key1 = new T(item);
 			} else {
-				current->key2 = item;
+				current->key2 = new T(item);
 			}
 			return NULL;
 		} else { // case 2 node is full, so split
 			//Counter::increment("Insert full leaf",1);
 			current->left = new TreeNode<T>;
 			current->mid = new TreeNode<T>;
-			if (*item < *current->key1) {
-				current->left->key1 = item;
+			if (item < *current->key1) {
+				current->left->key1 = new T(item);
 				current->mid->key1 = current->key2;
 				current->key2 = NULL;
 				return current;
-			} else if (*current->key2 < *item) {
+			} else if (*current->key2 < item) {
 				current->left->key1 = current->key1;
-				current->mid->key1 = item;
+				current->mid->key1 = new T(item);
 				current->key1 = current->key2;
 				current->key2 = NULL;
 				return current;
@@ -175,7 +173,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 				current->left->key1 = current->key1;
 				current->mid->key1 = current->key2;
 				current->key2 = NULL;
-				current->key1 = item;
+				current->key1 = new T(item);
 				return current;
 			}
 		}
@@ -183,7 +181,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 		TreeNode<T> * l;
 		TreeNode<T> * r;
 		TreeNode<T> * result;
-		if (*item < *current->key1) { // Left path
+		if (item < *current->key1) { // Left path
 			result = recursive_insert(item, current->left);
 			if (result != NULL) { // Uh oh, need to split?
 				if (current->key2) { //Node is full, split
@@ -207,7 +205,7 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 					return NULL;
 				}
 			}
-		} else if (current->key2 && *current->key2 < *item) { // right path
+		} else if (current->key2 && *current->key2 < item) { // right path
 			result = recursive_insert(item, current->right);
 			if (result != NULL) { // Uh oh, need to split?
 				//Counter::increment("Insert from right into full",1);
@@ -261,25 +259,25 @@ TreeNode<T>* BTree<T>::recursive_insert(T* item, TreeNode<T>* current) {
 
 // Inserts an item in to the tree if it does not already exist. Returns the item inserted.
 template <typename T>
-T* BTree<T>::insert(T* item) {
+bool BTree<T>::insert(T & item) {
 	T* res = lookup(item);
 	if (!res) {
 		if (is_empty()) {
 			root = new TreeNode<T>;
-			root->key1 = item;
+			root->key1 = new T(item);
 			//Counter::increment("Insert 1st element",1);
 		} else {
 			recursive_insert(item, root);
+
 		}
-		return lookup(item);
-	} else {
-		return res;
+		return true;
 	}
+	return false;
 }
 
 // Finds the parent of the node 'child' starting from 'current' using the search key 'item'
 template <typename T>
-TreeNode<T>* BTree<T>::find_parent(T* item, TreeNode<T> * current, TreeNode<T> * child) {
+TreeNode<T>* BTree<T>::find_parent(T& item, TreeNode<T> * current, TreeNode<T> * child) {
 	if (current == child) {
 		return NULL;
 	}
@@ -287,9 +285,9 @@ TreeNode<T>* BTree<T>::find_parent(T* item, TreeNode<T> * current, TreeNode<T> *
 			(current->right && current->right == child)) {	// base case, this node is parent
 		return current;
 	} else { // use item to path down the tree
-		if (*item < *current->key1)
+		if (item < *current->key1)
 			return find_parent(item, current->left, child);
-		else if (current->key2 && *current->key2 < *item)
+		else if (current->key2 && *current->key2 < item)
 			return find_parent(item, current->right, child);
 		else
 			return find_parent(item, current->mid, child);
@@ -437,7 +435,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					lc->right = mc->mid;
 					delete(parent->mid);
 					parent->mid = NULL; // Parent is new hole
-					fix(find_parent(lc->key1,root,parent), parent);
+					fix(find_parent(*lc->key1,root,parent), parent);
 				}
 			} else if (mc == hole) {
 				if (lc->key2) { // hole is mid, left is full
@@ -459,7 +457,7 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 					lc->right = mc->left;
 					delete(parent->mid);
 					parent->mid = NULL; // Parent is new hole
-					fix(find_parent(lc->key1,root,parent), parent);
+					fix(find_parent(*lc->key1,root,parent), parent);
 				}
 			}
 		}
@@ -469,9 +467,9 @@ void BTree<T>::fix(TreeNode<T>* parent, TreeNode<T>* hole) {
 
 // Removes keys from the leaf nodes and potentially creates holes
 template <typename T>
-T* BTree<T>::remove(T* item) {
+bool BTree<T>::remove(T& item) {
 	if (!lookup(item)) {
-		return NULL;
+		return false;
 	}
 	TreeNode<T>* hole = NULL;
 	TreeNode<T>* parent;
@@ -481,7 +479,7 @@ T* BTree<T>::remove(T* item) {
 	if (location->left) {	// deleting from a branch node, find immediate predecessor
 		//Counter::increment("Deleting from branch node",1);
 		TreeNode<T>* pred; // need the predecessor
-		if (location->key2 && !(*item < *location->key2) && !(*location->key2 < *item) ) { // remove location->key2
+		if (location->key2 && !(item < *location->key2) && !(*location->key2 < item) ) { // remove location->key2
 			pred = location->mid;
 			loc_replacee = 2;
 		} else {	// remove location->key1
@@ -495,21 +493,25 @@ T* BTree<T>::remove(T* item) {
 				pred = pred->mid;
 			}
 		}
-		parent = find_parent(pred->key1, root, pred);
+		parent = find_parent(*pred->key1, root, pred);
 		if (loc_replacee == 2) { // remove location->key2
 			if (pred->key2) {
+				delete location->key2;
 				location->key2 = pred->key2;
 				pred->key2 = NULL;
 			} else { // Removing will empty the leaf, creating a hole
+				delete location->key2;
 				location->key2 = pred->key1;
 				pred->key1 = NULL;
 				hole = pred;
 			}
 		} else {	// remove location->key1
 			if (pred->key2) {
+				delete location->key1;
 				location->key1 = pred->key2;
 				pred->key2 = NULL;
 			} else { // Removing will empty t=he leaf, creating a hole
+				delete location->key1;
 				location->key1 = pred->key1;
 				pred->key1 = NULL;
 				hole = pred;
@@ -519,14 +521,17 @@ T* BTree<T>::remove(T* item) {
 		parent = find_parent(item, root, location);
 		if (location->key2) {
 			//Counter::increment("Deleting from a full leaf",1);
-			if (!(*item < *location->key2) && !(*location->key2 < *item) ){
+			if (!(item < *location->key2) && !(*location->key2 < item) ){
+				delete location->key2;
 				location->key2 = NULL;
 			} else {
+				delete location->key1;
 				location->key1 = location->key2;
 				location->key2 = NULL;
 			}
 		} else { // Removing will empty the leaf, creating a hole
 			//Counter::increment("Deleting from an open leaf",1);
+			delete location->key1;
 			location->key1 = NULL;
 			hole = location;
 		}
@@ -535,7 +540,7 @@ T* BTree<T>::remove(T* item) {
 	if (hole) {
 		fix(parent, hole);
 	}
-	return item;
+	return true;
 }
 
 // Walk function that actually does all the work

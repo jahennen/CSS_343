@@ -3,10 +3,11 @@
 #include "CharFreqCounter.h"
 #include "CounterToHuffNodePQ.h"
 #include <iostream>
+#include <map>
 
 using namespace std;
 
-void preorderPrint(HuffNode current);
+void preorderPrint(HuffNode * current, string encoding);
 
 int main() {
 	CharFreqCounter counts;
@@ -26,7 +27,7 @@ int main() {
 
 	PQueue<HuffNode> queue;
 	// Use conversion object to transform CharFreqCounter elements into HuffNodes,
-	// and insert them into the queue
+	// and i1nsert them into the queue
 	CounterToHuffNodePQ converter(&counts, &queue);
 
 	while (queue.size() > 1) {
@@ -37,11 +38,17 @@ int main() {
 	}
 	HuffNode root = queue.pop();
 
+	map<char, string> encodings;
+
 	return 0;
 }
 
-void preorderPrint(HuffNode current) {
-//	if (current) {
-//		cout << current.g
-//	}
+void preorderPrint(HuffNode * current) {
+	if(current) {
+		if ( current->c != '\0') {
+			cout << current->c << " " << current->count<< endl;
+		}
+		preorderPrint(current->left);
+		preorderPrint(current->right);
+	}
 }

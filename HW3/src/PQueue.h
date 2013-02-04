@@ -19,9 +19,9 @@ public:
 	~PQueue();
 	bool isEmpty();
 	int size();
-	T top();
+	T * top();
 	void push(T &item);
-	T pop();
+	T * pop();
 private:
 	vector<T> data;
 	int end;

@@ -1,7 +1,6 @@
 #include "PQueue.h"
 #include "HuffNode.h"
-#include "CharFreqCounter.h"
-#include "CounterToHuffNodePQ.h"
+#include "BTreeMap.h"
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -31,7 +30,7 @@ int main(int argc, char* argv[]) {
 
 	PQueue<HuffNode> queue;
 	while(types.size() > 0) {
-		HuffNode newNode(counts.get(types.back()),types.back());
+		HuffNode newNode(*counts.get(types.back()),types.back());
 		types.pop_back();
 		queue.push(newNode);
 	}

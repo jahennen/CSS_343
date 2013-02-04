@@ -30,7 +30,7 @@ int PQueue<T>::size() {
 }
 
 template <typename T>
-T PQueue<T>::top() {
+T * PQueue<T>::top() {
 	return data[1];
 }
 
@@ -62,7 +62,7 @@ void PQueue<T>::swap(int i1, int i2) {
 }
 
 template <typename T>
-T PQueue<T>::pop() {
+T * PQueue<T>::pop() {
 	if (isEmpty()) {
 		cerr << "Queue empty" << endl;
 		return NULL;

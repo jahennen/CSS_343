@@ -18,7 +18,7 @@ class HuffNode {
 public:
 	HuffNode();
 	HuffNode(int sum, HuffNode * l, HuffNode * r);
-	HuffNode(CharIntMap * item);
+	HuffNode(int & count, char & character);
 	~HuffNode();
 	char getChar();
 	int getCount();

@@ -21,9 +21,9 @@ HuffNode::HuffNode(int sum, HuffNode * l, HuffNode * r) {
 	right = r;
 }
 
-HuffNode::HuffNode(int & num, char & character) {
-	count = num;
-	c = character;
+HuffNode::HuffNode(int * num, char * character) {
+	count = *num;
+	c = *character;
 	right = NULL;
 	left = NULL;
 }

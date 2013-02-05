@@ -30,18 +30,20 @@ int main(int argc, char* argv[]) {
 
 	PQueue<HuffNode> queue;
 	while(types.size() > 0) {
-		HuffNode newNode(*counts.get(types.back()),types.back());
+		HuffNode newNode(counts.get(types.back()),&types.back());
 		types.pop_back();
 		queue.push(newNode);
 	}
 
 	while (queue.size() > 1) {
-		HuffNode * node1 = new HuffNode(queue.pop());
-		HuffNode * node2 = new HuffNode(queue.pop());
+		HuffNode * node1 = queue.pop();
+		HuffNode * node2 = queue.pop();
 		HuffNode newNode(node1->getCount()+node2->getCount(), node1, node2);
 		queue.push(newNode);
 	}
-	HuffNode root = queue.pop();
+	HuffNode * root = queue.pop();
+
+
 
 	BTreeMap<char, string> encodings;
 

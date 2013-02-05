@@ -67,7 +67,7 @@ T * PQueue<T>::pop() {
 		cerr << "Queue empty" << endl;
 		return NULL;
 	}
-	T item = data[1];
+	T* item = &data[1];
 	data[1] = data[end-1];
 	end--;
 	data.pop_back();

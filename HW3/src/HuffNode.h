@@ -5,12 +5,10 @@
  *      Author: jay
  */
 
-#ifndef HUFFTREE_H_
-#define HUFFTREE_H_
+#ifndef HUFFNODE_H_
+#define HUFFNODE_H_
 
-#include <cstdlib>
 #include <iostream>
-#include "CharIntMap.h"
 
 using namespace std;
 

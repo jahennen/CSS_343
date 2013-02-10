@@ -6,14 +6,12 @@ int main() {
 	string line;
 	while (getline(cin, line)) {
 		if(m.containsKey(line)) {
-			int * count = m.get(line);
-			*count += 1;
+			*(m.get(line)) += 1;
 		} else {
-			int i = 1;
-			m.add(line, i);
+			m.add(line, 1);
 		}
 	}
 
-	m.print();
+	//m.print();
 	return 0;
 }

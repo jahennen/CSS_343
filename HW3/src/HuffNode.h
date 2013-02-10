@@ -16,7 +16,7 @@ class HuffNode {
 public:
 	HuffNode();
 	HuffNode(int sum, HuffNode * l, HuffNode * r);
-	HuffNode(int * count, char * character);
+	HuffNode(int count, char character);
 	~HuffNode();
 	char getChar();
 	int getCount();

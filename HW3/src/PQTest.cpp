@@ -1,8 +1,18 @@
+/*
+ * PQTest.cpp
+ *
+ *  Created on: Feb 1, 2013
+ *      Author: jay
+ *
+ *      This is a real simple test for the PQueue. Inset SIZE number of random
+ *      integers, pop them all and test that they are sorted.
+ */
+
 #include <iostream>
 #include <cstdlib>
 #include "PQueue.h"
 
-#define SIZE 50
+#define SIZE 5000
 
 using namespace std;
 
@@ -22,15 +32,32 @@ int main() {
 			q.push(*(p+i));
 		}
 
+		// add all elements to result array
 		vector<int> result;
 		while(!q.isEmpty()) {
-			result.push_back(q.pop());
+			int * temp = q.pop();
+			result.push_back(*temp);
+			delete temp;
 		}
-		unsigned int k;
-		for (k = 0; k < result.size(); k++) {
-			cout << " " << result[k];
+//		unsigned int k;
+//		for (k = 0; k < result.size(); k++) {
+//			cout << " " << result[k];
+//		}
+//		cout << endl;
+
+		// If result is not sorted, something went wrong
+		// uncomment above code to view all elements inline
+		unsigned int l;
+		bool fail = false;
+		for (l = 1; l < result.size() ; l++) {
+			if (result[l-1] > result[l]) {
+				cout << "LIST NOT SORTED, FAILURE" << endl;
+				fail = true;
+			}
 		}
-		cout << endl;
+		if (!fail) {
+			cout << "Test was successful, integers were sorted" << endl;
+		}
 		delete[] a;
 	return 0;
 }

@@ -3,6 +3,9 @@
  *
  *  Created on: Feb 1, 2013
  *      Author: jay
+ *
+ *      PQueue template using a vector, implements basic priority queue
+ *      methods sugh as push, pop, top, size, and isEmpty
  */
 
 #ifndef PQUEUE_H_

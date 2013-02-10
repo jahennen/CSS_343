@@ -9,7 +9,7 @@
 #define HUFFTREE_H_
 
 #include "HuffNode.h"
-#include "BTreeMap.h"
+#include <vector>
 
 using namespace std;
 
@@ -17,9 +17,11 @@ class HuffTree {
 public:
 	HuffTree(HuffNode * huffroot);
 	~HuffTree();
-	void addEncodings(BTreeMap<char, string> * map);
+	void addEncodings(vector<string> * map);
+	HuffNode * returnRoot();
 private:
-	void re_addEncodings(BTreeMap<char, string> *map, HuffNode * current, string & encoding);
+	void cleanUp(HuffNode * current);
+	void re_addEncodings(vector<string> *map, HuffNode * current, string & encoding);
 	HuffNode * root;
 };
 

@@ -81,17 +81,17 @@ void BTree<T>::clean_up(TreeNode<T> * current) {
 		return;
 	}
 	if (!current->left) { //Leaf
-		current->key1 = NULL;
+		delete current->key1;
 		if (current->key2)
-			current->key2 = NULL;
+			delete current->key2;
 	} else {
 		clean_up(current->left);
 		delete current->left;
-		current->key1 = NULL;
+		delete current->key1;
 		clean_up(current->mid);
 		delete current->mid;
 		if (current->key2) {
-			current->key2 = NULL;
+			delete current->key2;
 			clean_up(current->right);
 			delete current->right;
 		}

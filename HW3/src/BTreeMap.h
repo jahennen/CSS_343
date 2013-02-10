@@ -16,10 +16,11 @@ using namespace std;
 template <typename K, typename V>
 class KVMap {
 public:
-	KVMap(K & k, V & v) {
+	KVMap(K k, V v) {
 		key = k;
 		value = v;
 	}
+	~KVMap() {}
 	K key;
 	V value;
 	bool operator<(const KVMap & rhs) const {
@@ -42,10 +43,10 @@ public:
 	BTreeMap();
 	~BTreeMap();
 	bool isEmpty();
-	bool add(K & k, V & v);
-	bool containsKey(K & k);
-	V* get(K & key);
-	bool remove(K & key);
+	bool add(K k, V v);
+	bool containsKey(K k);
+	V* get(K key);
+	bool remove(K key);
 	void print();
 
 private:
@@ -64,27 +65,25 @@ bool BTreeMap<K,V>::isEmpty() {
 }
 
 template <typename K, typename V>
-bool BTreeMap<K,V>::add(K & k, V & v) {
+bool BTreeMap<K,V>::add(K k, V v) {
 	KVMap<K,V> entry(k, v);
 	return tree.insert(entry);
 }
 
 template <typename K, typename V>
-bool BTreeMap<K,V>::containsKey(K & k) {
-	V temp;
-	KVMap<K,V> entry(k,temp);
+bool BTreeMap<K,V>::containsKey(K k) {
+	KVMap<K,V> entry(k,0);
 	return tree.lookup(entry);
 }
 
 template <typename K, typename V>
-V* BTreeMap<K,V>::get(K & k) {
-	V temp;
-	KVMap<K,V> entry(k,temp);
+V* BTreeMap<K,V>::get(K k) {
+	KVMap<K,V> entry(k,0);
 	return &tree.lookup(entry)->value;
 }
 
 template <typename K, typename V>
-bool BTreeMap<K,V>::remove(K & k) {
+bool BTreeMap<K,V>::remove(K k) {
 	V temp;
 	KVMap<K,V> entry(k,temp);
 	return tree.remove(entry);

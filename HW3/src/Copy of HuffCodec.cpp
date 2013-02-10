@@ -4,30 +4,59 @@
 #include "HuffTree.h"
 #include <iostream>
 #include <fstream>
+#include <math.h>
+#include <map>
 
 using namespace std;
 
-void encode(ifstream & in, ofstream & out, vector<string> * encodings);
+void encode(ifstream & in, ofstream & out, BTreeMap<char, string> * encodings);
 
-void decode(ifstream & in, ofstream & out, HuffTree & tree);
+void decode(ifstream & in, ofstream & out, HuffTree & tree, BTreeMap<char, int> & counts);
 
 int main(int argc, char* argv[]) {
-	vector<int> types(255);
+	BTreeMap<char, int> counts;
+	vector<char> types;
+//	string line;
+//	ifstream file;
+//	file.open(argv[1], ios::in);
+//	while (getline(file,line)) {
+//		line.push_back('\n');
+//		unsigned int i;
+//		for (i = 0 ; i < line.size() ; i++) {
+//			char c = line[i];
+//			if (counts.containsKey(c)) {
+//				int * count = counts.get(c);
+//				*count += 1;
+//			} else {
+//				int i = 1;
+//				counts.add(c,i);
+//				types.push_back(c);
+//			}
+//		}
+//	}
+	vector<char> types;
 	char c;
 	ifstream file;
 	file.open(argv[1], ios::in);
 	while (file.get(c)) {
-		types[c]++;
+		if (counts.containsKey(c)) {
+			int * count = counts.get(c);
+			*count += 1;
+		} else {
+			int i = 1;
+			counts.add(c,i);
+			types.push_back(c);
+		}
 	}
 	file.close();
 
+	counts.print();
+
 	PQueue<HuffNode> queue;
-	unsigned int k;
-	for(k = 0; k < types.size(); k++) {
-		if (types[k] != 0) {
-			HuffNode newNode(types[k],k);
-			queue.push(newNode);
-		}
+	while(types.size() > 0) {
+		HuffNode newNode(counts.get(types.back()),&types.back());
+		types.pop_back();
+		queue.push(newNode);
 	}
 
 	while (queue.size() > 1) {
@@ -38,32 +67,36 @@ int main(int argc, char* argv[]) {
 	}
 
 	HuffTree huff(queue.pop());
-	vector<string> encodings(255);
-	huff.addEncodings(&encodings);
+	BTreeMap<char, string> * encodings = new BTreeMap<char,string>();
+	huff.addEncodings(encodings);
 
-	file.open(argv[1], ios::in); // reopen file
-	ofstream out (argv[2]); // create output file
+	encodings->print();
 
-	encode(file, out, &encodings);
+	file.open(argv[1], ios::in);
+	ofstream out (argv[2]);
+
+	encode(file, out, encodings);
 
 	out.close();
 	file.close();
-	file.open(argv[2]); // open coded file
-	out.open(argv[3]);  // create decode file
+	file.open(argv[2]);
+	out.open(argv[3]);
 
-	decode(file, out, huff);
+	decode(file, out, huff, counts);
+
+
 	return 0;
 }
 
-void encode(ifstream & in, ofstream & out, vector<string> * encodings) {
+void encode(ifstream & in, ofstream & out, BTreeMap<char, string> * encodings) {
 	char c;
 	unsigned char byte;
 	string cmd;
 	while (in.get(c)) {
-		cmd.append(encodings->at(c)); // append encodings
+		cmd.append(*encodings->get(c)); // append encodings
 		while (cmd.length() < 8 && !in.eof()) { // while cmd < 8 bits long and next char is not EOF
 			in.get(c);
-			cmd.append(encodings->at(c)); // append encodings
+			cmd.append(*encodings->get(c)); // append encodings
 		}
 		unsigned int byteLen = 8;
 		if (cmd.length() >= byteLen) {
@@ -97,15 +130,17 @@ void encode(ifstream & in, ofstream & out, vector<string> * encodings) {
 	for (j = 0; j < pad; j++) { // shift final byte to proper alignment
 		byte = byte<<1;
 	}
+	cout << cmd << "  " << (int)byte << endl;
 	out.put(byte); // this should be the last byte
 }
 
-void decode(ifstream & in, ofstream & out, HuffTree & tree) {
+void decode(ifstream & in, ofstream & out, HuffTree & tree, BTreeMap<char, int> & counts) {
 	char c;
 	string buf;
 	HuffNode * root = tree.returnRoot();
 	HuffNode * current = root;
 	int maxChars = root->getCount();
+	cout << "chars" << maxChars << endl;
 	int k = 0;
 	while (k < maxChars-1) {
 		in.get(c); // store coded character into c

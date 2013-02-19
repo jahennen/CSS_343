@@ -1,6 +1,5 @@
 #include "PQueue.h"
 #include "HuffNode.h"
-#include "BTreeMap.h"
 #include "HuffTree.h"
 #include <iostream>
 #include <fstream>
@@ -11,13 +10,15 @@ void encode(ifstream & in, ofstream & out, vector<string> * encodings);
 
 void decode(ifstream & in, ofstream & out, HuffTree & tree);
 
+void printEncodings(vector<int> & counts, vector<string> & encodings);
+
 int main(int argc, char* argv[]) {
-	vector<int> types(255);
+	vector<int> types(256);
 	char c;
 	ifstream file;
 	file.open(argv[1], ios::in);
 	while (file.get(c)) {
-		types[c]++;
+		types[(unsigned char)c]++;
 	}
 	file.close();
 
@@ -38,8 +39,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	HuffTree huff(queue.pop());
-	vector<string> encodings(255);
+	vector<string> encodings(256);
 	huff.addEncodings(&encodings);
+	printEncodings(types, encodings);
 
 	file.open(argv[1], ios::in); // reopen file
 	ofstream out (argv[2]); // create output file
@@ -60,10 +62,10 @@ void encode(ifstream & in, ofstream & out, vector<string> * encodings) {
 	unsigned char byte;
 	string cmd;
 	while (in.get(c)) {
-		cmd.append(encodings->at(c)); // append encodings
+		cmd.append(encodings->at((unsigned char)c)); // append encodings
 		while (cmd.length() < 8 && !in.eof()) { // while cmd < 8 bits long and next char is not EOF
 			in.get(c);
-			cmd.append(encodings->at(c)); // append encodings
+			cmd.append(encodings->at((unsigned char)c)); // append encodings
 		}
 		unsigned int byteLen = 8;
 		if (cmd.length() >= byteLen) {
@@ -133,5 +135,39 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 			buf.erase(buf.begin());
 		}
 	}
-	out.put(current->getChar()); // Last character
+	if (current->getChar() != '\0')
+		out.put(current->getChar()); // Last character
+}
+
+class outString {
+public:
+	int count;
+	char c;
+	string encoding;
+	bool operator<(const outString & rhs) const {
+		return count < rhs.count;
+	}
+};
+
+void printEncodings(vector<int> & counts, vector<string> & encodings) {
+	PQueue<outString> sorter;
+	unsigned int i;
+	for (i = 0; i < 256; i++) {
+		if (counts[i] != 0) {
+			outString o = {counts[i],(char)i,encodings[i]};
+			sorter.push(o);
+		}
+	}
+	while (!sorter.isEmpty()) {
+		outString * out = sorter.pop();
+		printf("0x%-2x  ", out->c);
+		if (isprint(out->c)) {
+			cout << "(" << out->c << ")";
+		} else {
+			cout << "( )";
+		}
+		printf("%8d  ", out->count);
+		cout << "[" << out->encoding << "]" << endl;
+		delete out;
+	}
 }

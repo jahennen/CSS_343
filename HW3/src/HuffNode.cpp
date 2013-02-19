@@ -32,7 +32,7 @@ HuffNode::~HuffNode() {
 
 }
 
-char HuffNode::getChar() {
+unsigned char HuffNode::getChar() {
 	return c;
 }
 

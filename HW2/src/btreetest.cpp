@@ -6,7 +6,6 @@
  */
 
 #include <iostream>
-#include <cassert>
 #include "BTree.h"
 #include "counter/counter.h"
 

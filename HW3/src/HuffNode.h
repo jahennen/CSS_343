@@ -18,10 +18,10 @@ public:
 	HuffNode(int sum, HuffNode * l, HuffNode * r);
 	HuffNode(int count, char character);
 	~HuffNode();
-	char getChar();
+	unsigned char getChar();
 	int getCount();
 	bool operator<(const HuffNode & rhs) const;
-	char c;
+	unsigned char c;
 	int count;
 	HuffNode * left;
 	HuffNode * right;

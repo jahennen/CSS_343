@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
 	}
 	file.close();
 
+
 	PQueue<HuffNode> queue;
 	unsigned int k;
 	for(k = 0; k < types.size(); k++) {

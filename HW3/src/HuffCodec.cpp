@@ -33,8 +33,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	while (queue.size() > 1) {
-		HuffNode * node1 = queue.pop();
-		HuffNode * node2 = queue.pop();
+		HuffNode * node1 = queue.top();
+		queue.pop();
+		HuffNode * node2 = queue.top();
+		queue.pop();
 		HuffNode newNode(node1->getCount()+node2->getCount(), node1, node2);
 		queue.push(newNode);
 	}
@@ -159,8 +161,9 @@ void printEncodings(vector<int> & counts, vector<string> & encodings) {
 			sorter.push(o);
 		}
 	}
-	while (!sorter.isEmpty()) {
-		outString * out = sorter.pop();
+	while (!sorter.empty()) {
+		outString * out = sorter.top();
+		sorter.pop();
 		printf("0x%-2x  ", out->c);
 		if (isprint(out->c)) {
 			cout << "(" << out->c << ")";

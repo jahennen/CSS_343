@@ -21,7 +21,7 @@ template <typename T>
 PQueue<T>::~PQueue() {}
 
 template <typename T>
-bool PQueue<T>::isEmpty() {
+bool PQueue<T>::empty() {
 	return end == 1;
 }
 
@@ -34,13 +34,13 @@ int PQueue<T>::size() {
 // Returns the smallest element
 template <typename T>
 T * PQueue<T>::top() {
-	return data[1];
+	return new T(data[1]);
 }
 
 // Push an item into the queue
 template <typename T>
 void PQueue<T>::push(T &item) {
-	if (isEmpty()) {
+	if (empty()) {
 		data.push_back(item);
 		end++;
 		return;
@@ -66,12 +66,11 @@ void PQueue<T>::swap(int i1, int i2) {
 
 // Pops the smallest element and returns a pointer to it.
 template <typename T>
-T * PQueue<T>::pop() {
-	if (isEmpty()) {
+void PQueue<T>::pop() {
+	if (empty()) {
 		cerr << "Queue empty" << endl;
 		return NULL;
 	}
-	T* item = new T(data[1]);
 	data[1] = data[end-1]; // swap last element with root
 	end--;
 	data.pop_back(); // remove last element
@@ -96,7 +95,6 @@ T * PQueue<T>::pop() {
 			}
 		}
 	}
-	return item;
 }
 
 #endif /* PQUEUE_IMPL_H_ */

@@ -34,8 +34,9 @@ int main() {
 
 		// add all elements to result array
 		vector<int> result;
-		while(!q.isEmpty()) {
-			int * temp = q.pop();
+		while(!q.empty()) {
+			int * temp = q.top();
+			q.pop();
 			result.push_back(*temp);
 			delete temp;
 		}

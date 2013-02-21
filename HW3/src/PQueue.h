@@ -20,11 +20,11 @@ class PQueue {
 public:
 	PQueue();
 	~PQueue();
-	bool isEmpty();
+	bool empty();
 	int size();
 	T * top();
 	void push(T &item);
-	T * pop();
+	void pop();
 private:
 	vector<T> data;
 	int end;

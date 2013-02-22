@@ -15,11 +15,11 @@ class HuffTree {
 public:
 	HuffTree(HuffNode * huffroot);
 	~HuffTree();
-	void addEncodings(std::vector<std::string> * map);
-	HuffNode * returnRoot();
+	void addEncodings(std::vector<std::string> & map);
+	HuffNode & returnRoot();
 private:
 	void cleanUp(HuffNode * current);
-	void re_addEncodings(std::vector<std::string> *map, HuffNode * current, std::string & encoding);
+	void re_addEncodings(std::vector<std::string> & map, HuffNode * current, std::string & encoding);
 	HuffNode * root;
 };
 

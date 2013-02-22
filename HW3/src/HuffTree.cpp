@@ -30,13 +30,13 @@ HuffTree::~HuffTree() {
 	delete root;
 }
 
-void HuffTree::re_addEncodings(vector<string> * map, HuffNode *current, string & encoding) {
+void HuffTree::re_addEncodings(vector<string> & map, HuffNode * current, string & encoding) {
 	if (!current->left) { // leaf node, there's an encoding here
 		if (current == root) { // leaf and root (edge case where only 1 char is in tree)
 			encoding.push_back('0');
-			map->at(current->c) = encoding;
+			map.at(current->c) = encoding;
 		}
-		map->at(current->c) = encoding;
+		map.at(current->c) = encoding;
 	} else {
 		encoding.push_back('0');
 		re_addEncodings(map, current->left, encoding);
@@ -47,7 +47,7 @@ void HuffTree::re_addEncodings(vector<string> * map, HuffNode *current, string &
 	}
 }
 
-void HuffTree::addEncodings(vector<string> * map) {
+void HuffTree::addEncodings(vector<string> & map) {
 	string encoding = "";
 	re_addEncodings(map, root, encoding);
 }
@@ -66,7 +66,7 @@ void HuffTree::addEncodings(vector<string> * map) {
 //	}
 //}
 
-HuffNode * HuffTree::returnRoot() {
-	return root;
+HuffNode & HuffTree::returnRoot() {
+	return *root;
 }
 

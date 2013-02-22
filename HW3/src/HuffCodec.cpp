@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void encode(ifstream & in, ofstream & out, vector<string> * encodings);
+void encode(ifstream & in, ofstream & out, vector<string> & encodings);
 
 void decode(ifstream & in, ofstream & out, HuffTree & tree);
 
@@ -44,13 +44,13 @@ int main(int argc, char* argv[]) {
 	HuffTree huff(queue.top());
 	queue.pop();
 	vector<string> encodings(256);
-	huff.addEncodings(&encodings);
+	huff.addEncodings(encodings);
 	printEncodings(types, encodings);
 
 	file.open(argv[1], ios::in); // reopen file
 	ofstream out (argv[2]); // create output file
 
-	encode(file, out, &encodings);
+	encode(file, out, encodings);
 
 	out.close();
 	file.close();
@@ -61,15 +61,15 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-void encode(ifstream & in, ofstream & out, vector<string> * encodings) {
+void encode(ifstream & in, ofstream & out, vector<string> & encodings) {
 	char c;
 	unsigned char byte;
 	string cmd;
 	while (in.get(c)) {
-		cmd.append(encodings->at((unsigned char)c)); // append encodings
+		cmd.append(encodings.at((unsigned char)c)); // append encodings
 		while (cmd.length() < 8 && !in.eof()) { // while cmd < 8 bits long and next char is not EOF
 			in.get(c);
-			cmd.append(encodings->at((unsigned char)c)); // append encodings
+			cmd.append(encodings.at((unsigned char)c)); // append encodings
 		}
 		unsigned int byteLen = 8;
 		if (cmd.length() >= byteLen) {
@@ -109,9 +109,9 @@ void encode(ifstream & in, ofstream & out, vector<string> * encodings) {
 void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 	char c;
 	string buf;
-	HuffNode * root = tree.returnRoot();
-	HuffNode * current = root;
-	int maxChars = root->getCount();
+	HuffNode & root = tree.returnRoot();
+	HuffNode * current = &root;
+	int maxChars = root.getCount();
 	int k = 0;
 	while (k < maxChars) {
 		in.get(c); // store coded character into c
@@ -129,8 +129,8 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 			if (curChar != '\0') {
 				k++;
 				out.put(curChar);
-				current = root;
-				if (!(k < maxChars)) {
+				current = &root; //reset back to root
+				if (!(k < maxChars)) { // if you go past the max number of characters, game over
 					break;
 				}
 			}
@@ -177,6 +177,5 @@ void printEncodings(vector<int> & counts, vector<string> & encodings) {
 		}
 		printf("%8d  ", out->count);
 		cout << "[" << out->encoding << "]" << endl;
-		delete out;
 	}
 }

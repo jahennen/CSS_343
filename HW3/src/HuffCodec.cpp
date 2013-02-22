@@ -65,44 +65,30 @@ void encode(ifstream & in, ofstream & out, vector<string> & encodings) {
 	char c;
 	unsigned char byte;
 	string cmd;
+	int ticker = 0;
 	while (in.get(c)) {
 		cmd.append(encodings.at((unsigned char)c)); // append encodings
-		while (cmd.length() < 8 && !in.eof()) { // while cmd < 8 bits long and next char is not EOF
-			in.get(c);
-			cmd.append(encodings.at((unsigned char)c)); // append encodings
-		}
-		unsigned int byteLen = 8;
-		if (cmd.length() >= byteLen) {
-			unsigned int j;
-			for (j = 0; j < byteLen-1; j++) { // write 8 bits to the byte
-				if (cmd[j]=='0') {
-					byte = byte<<1;
-				} else {
-					byte++;
-					byte = byte<<1;
-				}
-			}
-			if (cmd[j]=='1') {
+		unsigned int j;
+		for (j = 0; j < cmd.length(); j++) { // write bits to the byte
+			 ticker++;
+			if (cmd[j]=='0') {
+				byte = byte<<1;
+			} else {
 				byte++;
+				byte = byte<<1;
 			}
-			cmd.erase(0,byteLen); // erase the characters which have been written
-			out.put(byte);
-			byte = 0; //reset byte
-		} // if encodings of characters in line do not fill a byte, then just continue
-	}
-	unsigned int j;
-	for (j = 0; j < cmd.length()-1; j++) { // write final bits to the byte
-		if (cmd[j]=='0') {
-			byte = byte<<1;
-		} else {
-			byte++;
-			byte = byte<<1;
+			if (ticker == 8) { //byte is done, write it
+				if (j != cmd.length()-1)
+					byte = byte>>1;
+				out.put(byte);
+				byte = 0; //reset byte
+				ticker = 0;
+				break;
+			}
 		}
+		cmd.erase(0,j); // erase the characters which have been written
 	}
-	unsigned int pad = 8 - cmd.length();
-	for (j = 0; j < pad; j++) { // shift final byte to proper alignment
-		byte = byte<<1;
-	}
+	byte = byte>>1;
 	out.put(byte); // this should be the last byte
 }
 
@@ -116,12 +102,23 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 	while (k < maxChars) {
 		in.get(c); // store coded character into c
 		int j;
-		for (j = 7; j >= 0; j--) { // create the tree traversal string from c
-			unsigned char q = 1;
-			if (c & q<<j) {
-				buf.push_back('1');
-			} else {
-				buf.push_back('0');
+		if (in.peek()) { // if not on last char
+			for (j = 7; j >= 0; j--) { // create the tree traversal string from c
+				unsigned char q = 1;
+				if (c & q<<j) {
+					buf.push_back('1');
+				} else {
+					buf.push_back('0');
+				}
+			}
+		} else {
+			for (j = 0; j < 8; j--) { // create the tree traversal string from c
+				unsigned char q = 1;
+				if (c & q<<j) {
+					buf.push_back('0');
+				} else {
+					buf.push_back('1');
+				}
 			}
 		}
 		while(buf.length() > 0) { // process 8 'directions' in batch
@@ -144,7 +141,6 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 	}
 	if (current->getChar() != '\0')
 		out.put(current->getChar()); // Last character
-	cout << buf << endl;
 }
 
 class outString {

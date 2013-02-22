@@ -13,8 +13,6 @@
 
 #include <vector>
 
-using namespace std;
-
 template <typename T>
 class PQueue {
 public:
@@ -26,7 +24,7 @@ public:
 	void push(T &item);
 	void pop();
 private:
-	vector<T> data;
+	std::vector<T> data;
 	int end;
 	void swap(int i1, int i2);
 };

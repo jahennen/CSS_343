@@ -1,6 +1,8 @@
 #include <iostream>
 #include "BTreeMap.h"
 
+using namespace std;
+
 int main() {
 	BTreeMap<string, int> m;
 	string line;

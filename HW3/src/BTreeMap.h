@@ -11,8 +11,6 @@
 #include <iostream>
 #include "BTree.h"
 
-using namespace std;
-
 template <typename K, typename V>
 class KVMap {
 public:
@@ -32,7 +30,7 @@ template <typename K, typename V>
 class printer {
 public:
 	void operator()(KVMap<K,V> * m) {
-		cout << m->key << "  " << m->value << "\n";
+		std::cout << m->key << "  " << m->value << "\n";
 	}
 };
 

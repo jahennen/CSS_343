@@ -41,7 +41,8 @@ int main(int argc, char* argv[]) {
 		queue.push(newNode);
 	}
 
-	HuffTree huff(queue.pop());
+	HuffTree huff(queue.top());
+	queue.pop();
 	vector<string> encodings(256);
 	huff.addEncodings(&encodings);
 	printEncodings(types, encodings);
@@ -112,7 +113,7 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 	HuffNode * current = root;
 	int maxChars = root->getCount();
 	int k = 0;
-	while (k < maxChars-1) {
+	while (k < maxChars) {
 		in.get(c); // store coded character into c
 		int j;
 		for (j = 7; j >= 0; j--) { // create the tree traversal string from c
@@ -129,6 +130,9 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 				k++;
 				out.put(curChar);
 				current = root;
+				if (!(k < maxChars)) {
+					break;
+				}
 			}
 			if (buf[0] == '0') { // traverse the tree, then trim command string
 				current = current->left;
@@ -140,6 +144,7 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 	}
 	if (current->getChar() != '\0')
 		out.put(current->getChar()); // Last character
+	cout << buf << endl;
 }
 
 class outString {

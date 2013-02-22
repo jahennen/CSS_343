@@ -15,8 +15,6 @@
 #include <iostream>
 //#include "counter/counter.h"
 
-using namespace std;
-
 template <typename T>
 class BTree;
 

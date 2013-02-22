@@ -11,6 +11,8 @@
 
 #define SIZE 10000
 
+using namespace std;
+
 int main() {
 	BTree<int> tree;
 	int a[SIZE];

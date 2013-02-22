@@ -68,8 +68,8 @@ void PQueue<T>::swap(int i1, int i2) {
 template <typename T>
 void PQueue<T>::pop() {
 	if (empty()) {
-		cerr << "Queue empty" << endl;
-		return NULL;
+		std::cerr << "Queue empty\n";
+		return;
 	}
 	data[1] = data[end-1]; // swap last element with root
 	end--;

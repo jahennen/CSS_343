@@ -7,6 +7,8 @@
 
 #include "HuffTree.h"
 
+using namespace std;
+
 HuffTree::HuffTree(HuffNode * huffroot) {
 	root = huffroot;
 

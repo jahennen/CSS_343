@@ -7,6 +7,8 @@
 
 #include "HuffNode.h"
 
+using namespace std;
+
 HuffNode::HuffNode() {
 	c = '\0';
 	count = 0;

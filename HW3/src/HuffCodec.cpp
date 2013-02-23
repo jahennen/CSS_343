@@ -8,6 +8,8 @@ using namespace std;
 
 void encode(ifstream & in, ofstream & out, vector<string> & encodings);
 
+void processCmd(string & cmd, unsigned char & byte, int & ticker, ofstream & out);
+
 void decode(ifstream & in, ofstream & out, HuffTree & tree);
 
 void printEncodings(vector<int> & counts, vector<string> & encodings);
@@ -68,28 +70,32 @@ void encode(ifstream & in, ofstream & out, vector<string> & encodings) {
 	int ticker = 0;
 	while (in.get(c)) {
 		cmd.append(encodings.at((unsigned char)c)); // append encodings
-		unsigned int j;
-		for (j = 0; j < cmd.length(); j++) { // write bits to the byte
-			 ticker++;
-			if (cmd[j]=='0') {
-				byte = byte<<1;
-			} else {
-				byte++;
-				byte = byte<<1;
-			}
-			if (ticker == 8) { //byte is done, write it
-				if (j != cmd.length()-1)
-					byte = byte>>1;
-				out.put(byte);
-				byte = 0; //reset byte
-				ticker = 0;
-				break;
-			}
-		}
-		cmd.erase(0,j); // erase the characters which have been written
+		processCmd(cmd, byte, ticker, out);
 	}
+	processCmd(cmd, byte, ticker, out);
 	byte = byte>>1;
+	int k;
+	for (k = 0; k < 8-ticker; k++)
+		byte = byte<<1;
 	out.put(byte); // this should be the last byte
+}
+
+// processes one encoding string at a time, writing bytes as necessary.
+void processCmd(string & cmd, unsigned char & byte, int & ticker, ofstream & out) {
+	unsigned int j;
+	for (j = 0; j < cmd.length(); j++) { // write bits to the byte
+		ticker++;
+		if (cmd[j]=='1') {
+			byte++;
+		}
+		if (ticker == 8) { //byte is done, write it
+			out.put(byte);
+			byte = 0; //reset byte
+			ticker = 0;
+		}
+		byte = byte<<1;
+	}
+	cmd.clear(); // erase the command string
 }
 
 void decode(ifstream & in, ofstream & out, HuffTree & tree) {
@@ -102,23 +108,12 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 	while (k < maxChars) {
 		in.get(c); // store coded character into c
 		int j;
-		if (in.peek()) { // if not on last char
-			for (j = 7; j >= 0; j--) { // create the tree traversal string from c
-				unsigned char q = 1;
-				if (c & q<<j) {
-					buf.push_back('1');
-				} else {
-					buf.push_back('0');
-				}
-			}
-		} else {
-			for (j = 0; j < 8; j--) { // create the tree traversal string from c
-				unsigned char q = 1;
-				if (c & q<<j) {
-					buf.push_back('0');
-				} else {
-					buf.push_back('1');
-				}
+		for (j = 7; j >= 0; j--) { // create the tree traversal string from c
+			unsigned char q = 1;
+			if (c & q<<j) {
+				buf.push_back('1');
+			} else {
+				buf.push_back('0');
 			}
 		}
 		while(buf.length() > 0) { // process 8 'directions' in batch
@@ -172,6 +167,6 @@ void printEncodings(vector<int> & counts, vector<string> & encodings) {
 			cout << "( )";
 		}
 		printf("%8d  ", out->count);
-		cout << "[" << out->encoding << "]" << endl;
+		cout << "[" << out->encoding << "] (" << out->encoding.length() << ")" << endl;
 	}
 }

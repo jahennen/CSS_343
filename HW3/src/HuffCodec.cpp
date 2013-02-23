@@ -168,5 +168,6 @@ void printEncodings(vector<int> & counts, vector<string> & encodings) {
 		}
 		printf("%8d  ", out->count);
 		cout << "[" << out->encoding << "] (" << out->encoding.length() << ")" << endl;
+		delete out;
 	}
 }

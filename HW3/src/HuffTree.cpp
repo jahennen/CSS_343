@@ -14,6 +14,28 @@ HuffTree::HuffTree(HuffNode * huffroot) {
 
 }
 
+HuffTree::HuffTree(vector<int>& types) {
+	PQueue<HuffNode> queue;
+	unsigned int k;
+	for(k = 0; k < types.size(); k++) {
+		if (types[k] != 0) {
+			HuffNode newNode(types[k],k);
+			queue.push(newNode);
+		}
+	}
+
+	while (queue.size() > 1) {
+		HuffNode * node1 = queue.top();
+		queue.pop();
+		HuffNode * node2 = queue.top();
+		queue.pop();
+		HuffNode newNode(node1->getCount()+node2->getCount(), node1, node2);
+		queue.push(newNode);
+	}
+	root = queue.top();
+	queue.pop();
+}
+
 void HuffTree::cleanUp(HuffNode * current) {
 	if (!current->left) {
 		return;

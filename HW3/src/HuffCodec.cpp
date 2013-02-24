@@ -109,11 +109,22 @@ void decode(ifstream & in, ofstream & out, HuffTree & tree) {
 		in.get(c); // store coded character into c
 		int j;
 		for (j = 7; j >= 0; j--) { // create the tree traversal string from c
+			char curChar = current->getChar();
+			if (curChar != '\0') {
+				k++;
+				out.put(curChar);
+				current = &root; //reset back to root
+				if (!(k < maxChars)) { // if you go past the max number of characters, game over
+					break;
+				}
+			}
 			unsigned char q = 1;
 			if (c & q<<j) {
 				buf.push_back('1');
+				current = current->right;
 			} else {
 				buf.push_back('0');
+				current = current->left;
 			}
 		}
 		while(buf.length() > 0) { // process 8 'directions' in batch

@@ -14,8 +14,10 @@
 class HuffTree {
 public:
 	HuffTree(HuffNode * huffroot);
+	HuffTree(std::vector<int> & types);
 	~HuffTree();
 	void addEncodings(std::vector<std::string> & map);
+	void processString(std::string & cmd, std::ofstream & out, )
 	HuffNode & returnRoot();
 private:
 	void cleanUp(HuffNode * current);

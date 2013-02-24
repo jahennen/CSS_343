@@ -19,12 +19,11 @@ public:
 	unsigned char getChar();
 	int getCount();
 	bool operator<(const HuffNode & rhs) const;
+private:
 	unsigned char c;
 	int count;
 	HuffNode * left;
 	HuffNode * right;
-private:
-
 };
 
 #endif /* HUFFTREE_H_ */

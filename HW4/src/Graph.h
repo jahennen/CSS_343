@@ -10,47 +10,47 @@
 
 #include <list>
 #include <vector>
-#include <cstdlib>
-
-using namespace std;
 
 class Graph {
 public:
 	class Node {
 	public:
-		Node(const string& id, const string& label = "", int cost):
+		Node(const std::string& id, const std::string& label = "", int cost):
 			id_(id), label_(label), cost_(cost) {}
-		const string& getID() {return id_;}
-		const string& getLabel() {return label_;}
+		const std::string& getID() {return id_;}
+		const std::string& getLabel() {return label_;}
+		std::string toString() {
+			return id_ + " " + label_ + " " + cost_;
+		}
+		friend bool operator<(const Node&, const Node&);
 	private:
-		string id_;
-		string label_;
+		std::string id_;
+		std::string label_;
 		int cost_;
 	};
 
 	class Edge {
 	public:
 		Edge(Node & from, Node & to, int w):
-		from_(from), to_(to), w_(w){
-			if(!from_ || !to_ || w_ < 0) {
-				cout << "Illegal arguments to Edge constructor" << endl;
-				exit (EXIT_FAILURE);
-			}
-		};
+		from_(from), to_(to), w_(w){};
 		const Node& from() {return from_;}
 		const Node& to() {return to_;}
 		const int label() {return w_;}
+		std::string toString() {
+			return from_ + " " + to_ + " " + w_;
+		}
+		friend bool operator<(const Edge&, const Edge&);
 	private:
 		Node * from_;
 		Node * to_;
 		int w_;
 	};
-	Graph(list<string> & nodes, vector<string> & edges);
+	Graph(std::list<std::string> & nodes, std::vector<std::string> & edges);
 	virtual ~Graph();
-	void getPath(vector<string> & path, string & n1, string & n2);
+	void getPath(std::vector<std::string> & path, std::string & n1, std::string & n2);
 private:
-	list<Node> nodes;
-	list<Edge> edges;
+	std::list<Node*> nodes;
+	std::list<Edge*> edges;
 };
 
 #endif /* GRAPH_H_ */

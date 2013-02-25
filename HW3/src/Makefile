@@ -4,8 +4,8 @@
 
 CFLAGS = -Wall -g -o
 
-SUPPORT_FILES = HuffNode.cpp HuffTree.cpp PQueue.h PQueue_impl.h BTree.h BTreeMap.h
-SUPPORT_CPP = HuffNode.cpp HuffTree.cpp
+SUPPORT_FILES = HuffTree.cpp PQueue.h PQueue_impl.h BitStream.cpp
+SUPPORT_CPP = HuffTree.cpp BitStream.cpp
 
 # targets
 pqtest: PQTest.cpp PQueue_impl.h PQueue.h

@@ -9,11 +9,6 @@
 
 using namespace std;
 
-HuffTree::HuffTree(HuffNode * huffroot) {
-	root = huffroot;
-
-}
-
 HuffTree::HuffTree(vector<int>& types) {
 	PQueue<HuffNode> queue;
 	unsigned int k;
@@ -36,20 +31,35 @@ HuffTree::HuffTree(vector<int>& types) {
 	queue.pop();
 }
 
-void HuffTree::cleanUp(HuffNode * current) {
-	if (!current->left) {
-		return;
-	} else {
-		cleanUp(current->left);
-		delete current->left;
-		cleanUp(current->right);
-		delete current->right;
+void HuffTree::decode(BitStream & bits, ostream & out) {
+	int maxChars = root->getCount();
+	int k = 0;
+	HuffNode * current = root;
+	bool bit;
+	while (k < maxChars) {
+		bits.getBit(bit); // store bit value into bit
+		char curChar = current->getChar();
+		if (!current->left) { //leaf
+			k++;
+			out.put(curChar);
+			current = root; //reset back to root
+		}
+		current = current->getChild(bit);
 	}
 }
 
 HuffTree::~HuffTree() {
-	cleanUp(root);
+	clean_up(root);
 	delete root;
+}
+
+void HuffTree::clean_up(HuffNode * current) {
+	if (current->left) { // not leaf
+		clean_up(current->left);
+		delete current->left;
+		clean_up(current->right);
+		delete current->right;
+	}
 }
 
 void HuffTree::re_addEncodings(vector<string> & map, HuffNode * current, string & encoding) {
@@ -88,7 +98,47 @@ void HuffTree::addEncodings(vector<string> & map) {
 //	}
 //}
 
-HuffNode & HuffTree::returnRoot() {
-	return *root;
+HuffTree::HuffNode::HuffNode() {
+	c = '\0';
+	count = 0;
+	left = NULL;
+	right = NULL;
+}
+
+HuffTree::HuffNode::HuffNode(int sum, HuffNode * l, HuffNode * r) {
+	c = '\0';
+	count = sum;
+	left = l;
+	right = r;
+}
+
+HuffTree::HuffNode::HuffNode(int num, char character) {
+	count = num;
+	c = character;
+	right = NULL;
+	left = NULL;
+}
+
+HuffTree::HuffNode::~HuffNode() {
+}
+
+unsigned char HuffTree::HuffNode::getChar() {
+	return c;
+}
+
+int HuffTree::HuffNode::getCount() {
+	return count;
+}
+
+HuffTree::HuffNode * HuffTree::HuffNode::getChild(bool bit) {
+	if (bit) {
+		return right;
+	} else {
+		return left;
+	}
+}
+
+bool HuffTree::HuffNode::operator<(const HuffNode & rhs) const {
+	return count < rhs.count;
 }
 

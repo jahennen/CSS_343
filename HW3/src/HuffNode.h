@@ -18,6 +18,7 @@ public:
 	~HuffNode();
 	unsigned char getChar();
 	int getCount();
+	HuffNode * getChild(bool bit);
 	bool operator<(const HuffNode & rhs) const;
 private:
 	unsigned char c;

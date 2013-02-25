@@ -31,7 +31,8 @@ HuffNode::HuffNode(int num, char character) {
 }
 
 HuffNode::~HuffNode() {
-
+	delete left;
+	delete right;
 }
 
 unsigned char HuffNode::getChar() {
@@ -40,6 +41,14 @@ unsigned char HuffNode::getChar() {
 
 int HuffNode::getCount() {
 	return count;
+}
+
+HuffNode * HuffNode::getChild(bool bit) {
+	if (bit) {
+		return right;
+	} else {
+		return left;
+	}
 }
 
 bool HuffNode::operator<(const HuffNode & rhs) const {

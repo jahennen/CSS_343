@@ -1,6 +1,6 @@
-#include "PQueue.h"
-#include "HuffNode.h"
 #include "HuffTree.h"
+#include "BitStream.h"
+#include "PQueue.h"
 #include <iostream>
 #include <fstream>
 
@@ -9,8 +9,6 @@ using namespace std;
 void encode(ifstream & in, ofstream & out, vector<string> & encodings);
 
 void processCmd(string & cmd, unsigned char & byte, int & ticker, ofstream & out);
-
-void decode(ifstream & in, ofstream & out, HuffTree & tree);
 
 void printEncodings(vector<int> & counts, vector<string> & encodings);
 
@@ -25,26 +23,7 @@ int main(int argc, char* argv[]) {
 	file.close();
 
 
-	PQueue<HuffNode> queue;
-	unsigned int k;
-	for(k = 0; k < types.size(); k++) {
-		if (types[k] != 0) {
-			HuffNode newNode(types[k],k);
-			queue.push(newNode);
-		}
-	}
-
-	while (queue.size() > 1) {
-		HuffNode * node1 = queue.top();
-		queue.pop();
-		HuffNode * node2 = queue.top();
-		queue.pop();
-		HuffNode newNode(node1->getCount()+node2->getCount(), node1, node2);
-		queue.push(newNode);
-	}
-
-	HuffTree huff(queue.top());
-	queue.pop();
+	HuffTree huff(types);
 	vector<string> encodings(256);
 	huff.addEncodings(encodings);
 	printEncodings(types, encodings);
@@ -59,7 +38,8 @@ int main(int argc, char* argv[]) {
 	file.open(argv[2]); // open coded file
 	out.open(argv[3]);  // create decode file
 
-	decode(file, out, huff);
+	BitStream bits(file);
+	huff.decode(bits, out);
 	return 0;
 }
 
@@ -96,57 +76,6 @@ void processCmd(string & cmd, unsigned char & byte, int & ticker, ofstream & out
 		byte = byte<<1;
 	}
 	cmd.clear(); // erase the command string
-}
-
-void decode(ifstream & in, ofstream & out, HuffTree & tree) {
-	char c;
-	string buf;
-	HuffNode & root = tree.returnRoot();
-	HuffNode * current = &root;
-	int maxChars = root.getCount();
-	int k = 0;
-	while (k < maxChars) {
-		in.get(c); // store coded character into c
-		int j;
-		for (j = 7; j >= 0; j--) { // create the tree traversal string from c
-			char curChar = current->getChar();
-			if (curChar != '\0') {
-				k++;
-				out.put(curChar);
-				current = &root; //reset back to root
-				if (!(k < maxChars)) { // if you go past the max number of characters, game over
-					break;
-				}
-			}
-			unsigned char q = 1;
-			if (c & q<<j) {
-				buf.push_back('1');
-				current = current->right;
-			} else {
-				buf.push_back('0');
-				current = current->left;
-			}
-		}
-		while(buf.length() > 0) { // process 8 'directions' in batch
-			char curChar = current->getChar();
-			if (curChar != '\0') {
-				k++;
-				out.put(curChar);
-				current = &root; //reset back to root
-				if (!(k < maxChars)) { // if you go past the max number of characters, game over
-					break;
-				}
-			}
-			if (buf[0] == '0') { // traverse the tree, then trim command string
-				current = current->left;
-			} else {
-				current = current->right;
-			}
-			buf.erase(buf.begin());
-		}
-	}
-	if (current->getChar() != '\0')
-		out.put(current->getChar()); // Last character
 }
 
 class outString {

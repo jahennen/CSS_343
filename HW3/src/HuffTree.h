@@ -8,19 +8,33 @@
 #ifndef HUFFTREE_H_
 #define HUFFTREE_H_
 
-#include "HuffNode.h"
+#include "PQueue.h"
+#include "BitStream.h"
 #include <vector>
 
 class HuffTree {
 public:
-	HuffTree(HuffNode * huffroot);
 	HuffTree(std::vector<int> & types);
 	~HuffTree();
 	void addEncodings(std::vector<std::string> & map);
-	void processString(std::string & cmd, std::ofstream & out, )
-	HuffNode & returnRoot();
+	void decode(BitStream & bits, std::ostream & out);
 private:
-	void cleanUp(HuffNode * current);
+	class HuffNode {
+	public:
+		HuffNode();
+		HuffNode(int sum, HuffNode * l, HuffNode * r);
+		HuffNode(int count, char character);
+		~HuffNode();
+		unsigned char getChar();
+		int getCount();
+		HuffNode * getChild(bool bit);
+		bool operator<(const HuffNode & rhs) const;
+		unsigned char c;
+		int count;
+		HuffNode * left;
+		HuffNode * right;
+	};
+	void clean_up(HuffNode * current);
 	void re_addEncodings(std::vector<std::string> & map, HuffNode * current, std::string & encoding);
 	HuffNode * root;
 };

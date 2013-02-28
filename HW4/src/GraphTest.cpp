@@ -5,12 +5,18 @@
  *      Author: jay
  */
 
-#include <Graph.h>
+#include "Graph.h"
+
 
 using namespace std;
 
 int main() {
-	Graph g();
+	vector<string> * nodes = new vector<string>(3);
+	*nodes = {"Hello", "Goodbye", "Silly"};
+	vector<pair<pair<string,string>, int > > * edges = new vector<pair<pair<string,string>, int> >(3);
+	*edges = {{{"Hello", "Goodbye"}, 5}, {{"Silly", "Goodbye"}, 4}};
+	Graph g(*nodes, *edges);
+	g.dumpGraph();
 	return 0;
 }
 

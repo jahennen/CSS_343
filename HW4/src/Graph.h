@@ -28,10 +28,10 @@ private:
 			const std::string getLabel() {return label_;}
 			const std::string toString() {
 				std::ostringstream out;
-				out << label_ << " " << cost_;
+				out << this << " " << label_ << " " << cost_;
 				return out.str();
 			}
-			bool operator<(const Node& rhs) const {return label_ < rhs.label_;}
+			bool operator<(const Node& rhs) const {return label_.compare(rhs.label_) < 0;}
 		private:
 			std::string label_;
 			int cost_;
@@ -41,13 +41,14 @@ private:
 		public:
 			Edge(Node & from, Node & to, int w):
 			from_(from), to_(to), w_(w){};
-			Edge(std::pair<std::string, std::string>& nodes, int w);
+			Edge(std::pair<Node&, Node&>& nodes, int w):
+				from_(nodes.first), to_(nodes.second), w_(w){};
 			const Node& getFrom() {return from_;}
 			const Node& getTo() {return to_;}
 			const int getLabel() {return w_;}
 			const std::string toString() {
 				std::ostringstream out;
-				out << from_.toString() << " " << to_.toString() << " " << w_;
+				out << this << " " << from_.toString() << " " << to_.toString() << " " << w_;
 				return out.str();
 			}
 			bool operator<(const Edge& rhs) const {
@@ -64,8 +65,10 @@ private:
 			Node& to_;
 			int w_;
 		};
-	std::set<Node*> nodes_;
-	std::set<Edge*> edges_;
+
+	Graph::Node& getNode(std::string& str);
+	std::map<std::string, Node> nodes_;
+	std::map<Node, std::vector<Edge>> edges_;
 };
 
 #endif /* GRAPH_H_ */

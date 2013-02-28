@@ -9,7 +9,8 @@
 #define GRAPH_H_
 
 #include <vector>
-#include <set>
+#include <list>
+#include <map>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -41,8 +42,9 @@ private:
 		public:
 			Edge(Node & from, Node & to, int w):
 			from_(from), to_(to), w_(w){};
-			Edge(std::pair<Node&, Node&>& nodes, int w):
-				from_(nodes.first), to_(nodes.second), w_(w){};
+//			Edge(std::pair<Node&, Node&>& nodes, int w):
+//				from_(nodes.first), to_(nodes.second), w_(w){};
+			Edge(const Edge& other):from_(other.from_), to_(other.to_), w_(other.w_){}
 			const Node& getFrom() {return from_;}
 			const Node& getTo() {return to_;}
 			const int getLabel() {return w_;}
@@ -54,11 +56,20 @@ private:
 			bool operator<(const Edge& rhs) const {
 				if (from_.getLabel() < rhs.from_.getLabel())
 					return true;
-				if (to_.getLabel() < rhs.to_.getLabel())
+				else if (from_.getLabel() == rhs.from_.getLabel() &&
+						to_.getLabel() < rhs.to_.getLabel())
 					return true;
-				if (w_ < rhs.w_)
+				else if (from_.getLabel() == rhs.from_.getLabel() &&
+						to_.getLabel() == rhs.to_.getLabel() &&
+						w_ < rhs.w_)
 					return true;
-				return false;
+				else
+					return false;
+			}
+			bool operator==(const Edge& rhs) const {
+				return (from_.getLabel() == rhs.from_.getLabel() &&
+						to_.getLabel() == rhs.to_.getLabel() &&
+						w_ == rhs.w_);
 			}
 		private:
 			Node& from_;

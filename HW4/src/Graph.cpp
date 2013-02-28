@@ -7,6 +7,8 @@
 
 #include "Graph.h"
 
+using namespace std;
+
 Graph::Graph() {
 	// TODO Auto-generated constructor stub
 

@@ -1,3 +1,11 @@
+/*
+ * HuffCodec.cpp
+ *
+ *  Created on: Feb 4, 2013
+ *      Author: jay
+ *
+ */
+
 #include "HuffTree.h"
 #include "BitStream.h"
 #include "PQueue.h"
@@ -6,9 +14,9 @@
 
 using namespace std;
 
-void encode(ifstream & in, ofstream & out, vector<string> & encodings);
+void encode(istream & in, ostream & out, vector<string> & encodings);
 
-void processCmd(string & cmd, unsigned char & byte, int & ticker, ofstream & out);
+void processCmd(string & cmd, unsigned char & byte, int & ticker, ostream & out);
 
 void printEncodings(vector<int> & counts, vector<string> & encodings);
 
@@ -43,7 +51,9 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
-void encode(ifstream & in, ofstream & out, vector<string> & encodings) {
+// Encodes all chars in the istream using the encodings and writes the encoded byte
+// to the ostream.
+void encode(istream & in, ostream & out, vector<string> & encodings) {
 	char c;
 	unsigned char byte;
 	string cmd;
@@ -61,7 +71,7 @@ void encode(ifstream & in, ofstream & out, vector<string> & encodings) {
 }
 
 // processes one encoding string at a time, writing bytes as necessary.
-void processCmd(string & cmd, unsigned char & byte, int & ticker, ofstream & out) {
+void processCmd(string & cmd, unsigned char & byte, int & ticker, ostream & out) {
 	unsigned int j;
 	for (j = 0; j < cmd.length(); j++) { // write bits to the byte
 		ticker++;
@@ -78,6 +88,8 @@ void processCmd(string & cmd, unsigned char & byte, int & ticker, ofstream & out
 	cmd.clear(); // erase the command string
 }
 
+// Helper class to compile/retain information about a char and encoding. Also
+// allows these entries to be sorted.
 class outString {
 public:
 	int count;
@@ -88,6 +100,7 @@ public:
 	}
 };
 
+// Produces the properly formatted output to cout.
 void printEncodings(vector<int> & counts, vector<string> & encodings) {
 	PQueue<outString> sorter;
 	unsigned int i;

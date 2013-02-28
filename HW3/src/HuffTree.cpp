@@ -9,27 +9,64 @@
 
 using namespace std;
 
-HuffTree::HuffTree(HuffNode * huffroot) {
-	root = huffroot;
+// Constructs a HuffTree object from a vector of character counts.
+HuffTree::HuffTree(vector<int>& types) {
+	PQueue<HuffNode> queue;
+	unsigned int k;
+	for(k = 0; k < types.size(); k++) {
+		if (types[k] != 0) {
+			HuffNode newNode(types[k],k);
+			queue.push(newNode);
+		}
+	}
 
+	while (queue.size() > 1) {
+		HuffNode * node1 = queue.top();
+		queue.pop();
+		HuffNode * node2 = queue.top();
+		queue.pop();
+		HuffNode newNode(node1->getCount()+node2->getCount(), node1, node2);
+		queue.push(newNode);
+	}
+	root = queue.top();
+	queue.pop();
 }
 
-void HuffTree::cleanUp(HuffNode * current) {
-	if (!current->left) {
-		return;
-	} else {
-		cleanUp(current->left);
-		delete current->left;
-		cleanUp(current->right);
-		delete current->right;
+// Traverses the tree using bits from a BitStream and writes the resulting
+// discovered characters to the ostream.
+void HuffTree::decode(BitStream & bits, ostream & out) {
+	int maxChars = root->getCount();
+	int k = 0;
+	HuffNode * current = root;
+	bool bit;
+	while (k < maxChars) {
+		bits.getBit(bit); // store bit value into bit
+		char curChar = current->getChar();
+		if (!current->left) { //leaf
+			k++;
+			out.put(curChar);
+			current = root; //reset back to root
+		}
+		current = current->getChild(bit);
 	}
 }
 
 HuffTree::~HuffTree() {
-	cleanUp(root);
+	clean_up(root);
 	delete root;
 }
 
+void HuffTree::clean_up(HuffNode * current) {
+	if (current->left) { // not leaf
+		clean_up(current->left);
+		delete current->left;
+		clean_up(current->right);
+		delete current->right;
+	}
+}
+
+// Helper method to recursively traverse the tree, produce encodings, and add them
+// to the passed collection.
 void HuffTree::re_addEncodings(vector<string> & map, HuffNode * current, string & encoding) {
 	if (!current->left) { // leaf node, there's an encoding here
 		if (current == root) { // leaf and root (edge case where only 1 char is in tree)
@@ -47,26 +84,53 @@ void HuffTree::re_addEncodings(vector<string> & map, HuffNode * current, string 
 	}
 }
 
+//Creates and adds all encodings in the tree to the passed collection.
 void HuffTree::addEncodings(vector<string> & map) {
 	string encoding = "";
 	re_addEncodings(map, root, encoding);
 }
 
-//char HuffTree::re_findEncoding(string & encoding, HuffNode * current) {
-//	if (!current->left) { // this is a leaf node
-//		return current->c;
-//	} else {
-//		if (encoding[0] == '0') {
-//			encoding.erase(0);
-//			return re_findEncoding(encoding, current->left);
-//		} else {
-//			encoding.erase(0);
-//			return re_findEncoding(encoding, current->right);
-//		}
-//	}
-//}
+HuffTree::HuffNode::HuffNode() {
+	c = '\0';
+	count = 0;
+	left = NULL;
+	right = NULL;
+}
 
-HuffNode & HuffTree::returnRoot() {
-	return *root;
+HuffTree::HuffNode::HuffNode(int sum, HuffNode * l, HuffNode * r) {
+	c = '\0';
+	count = sum;
+	left = l;
+	right = r;
+}
+
+HuffTree::HuffNode::HuffNode(int num, char character) {
+	count = num;
+	c = character;
+	right = NULL;
+	left = NULL;
+}
+
+HuffTree::HuffNode::~HuffNode() {
+}
+
+unsigned char HuffTree::HuffNode::getChar() {
+	return c;
+}
+
+int HuffTree::HuffNode::getCount() {
+	return count;
+}
+
+HuffTree::HuffNode * HuffTree::HuffNode::getChild(bool bit) {
+	if (bit) {
+		return right;
+	} else {
+		return left;
+	}
+}
+
+bool HuffTree::HuffNode::operator<(const HuffNode & rhs) const {
+	return count < rhs.count;
 }
 

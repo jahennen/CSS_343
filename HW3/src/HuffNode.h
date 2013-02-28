@@ -18,13 +18,13 @@ public:
 	~HuffNode();
 	unsigned char getChar();
 	int getCount();
+	HuffNode * getChild(bool bit);
 	bool operator<(const HuffNode & rhs) const;
+private:
 	unsigned char c;
 	int count;
 	HuffNode * left;
 	HuffNode * right;
-private:
-
 };
 
 #endif /* HUFFTREE_H_ */

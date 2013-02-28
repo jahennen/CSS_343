@@ -1,26 +1,18 @@
-CSS 343 Assignment 2 Submission README
+CSS 343 Assignment 3 Submission README
 
 Author: Jay Hennen
 
-The BTree is self-contained in BTree.h, along with the TreeNode class itself.
-The TreeNode class is NOT contained in the BTree class. I found it easier to
-work with by doing it in this way, and doesn't really affect the final product.
-BTree deletion IS fully implemented, mainly because of available free time and
-probable masochism. is_empty() was added public because of it's
-obvious usefulness in code clarity and functionality.
+Included files:
 
-btreetest.cpp is the test program. It creates an array of SIZE and populates it
-with random integers, which are then added in order and then deleted in reverse
-order. Checks for complete tree deletion and outputs counter data to check case 
-coverage.  
+BitStream.h
+BitStream.cpp
+HuffCodec.cpp (driver)
+HuffTree.cpp
+HuffTree.h
+PQueue.h
+PQueue_impl.h
+Run_ass3.sh
 
-The wordcount program uses the same rules as the wordcount program from
-assignment 1, just updated to use c++ style strings. A separate class Strmap
-(with it's own source/header files) are used to provide map functionality to the
-BTree.
-
-The dedup program uses the BTree to solve the set aspect of the posed problem
-and simply writes input lines directly to output if they do not exist in the
-set. As no example was given regarding any special output formatting, the simplest
-option was opted for.
-
+Numerous .txt files of various lengths are included for the run script.
+Average space savings seems to be about 40-45%. If there are errors in
+encoding or decoding, they will show up in the output.

@@ -39,7 +39,16 @@ int main() {
 	cout << "To:";
 	string t;
 	cin >> t;
-	cout << g.areDirectlyLinked(f, t) << endl;
+	vector<string> path;
+	g.getShortestPath(path, f, t);
+	cout << endl;
+	unsigned int i;
+	for(i = 0; i < path.size(); i++) {
+		cout << path[i] << endl;
+	}
+
+	g.dumpGraph();
+
 	return 0;
 }
 

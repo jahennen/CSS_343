@@ -19,16 +19,23 @@ int main() {
 	string line;
 	vector<string> nodes;
 	vector<pair<pair<string, string>, int > > edges;
+	Graph g;
 	while (getline(in, line)) {
 		stringstream strstr(line);
 		istream_iterator<string> it(strstr);
 		istream_iterator<string> end;
-		vector<string> elems(it, end);
-		nodes.push_back(elems[0]);
-		edges.push_back(pair<pair<string,string>,int>({elems[0], elems[1]}, atoi(elems[2].c_str())));
+		vector<string> elem(it, end);
+		g.insertEdge(elem[0], elem[1], atoi(elem[2].c_str()));
 	}
-	Graph g(nodes, edges);
 	g.dumpGraph();
+	cout << endl;
+	cout << "From:";
+	string f;
+	cin >> f;
+	cout << "To:";
+	string t;
+	cin >> t;
+	cout << g.areDirectlyLinked(f, t) << endl;
 	return 0;
 }
 

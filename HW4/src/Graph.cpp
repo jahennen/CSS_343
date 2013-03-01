@@ -9,48 +9,69 @@
 
 using namespace std;
 
-// Graph takes two parameters. The first is a vector of names of nodes. The second is
-// a vector of pairs of a pair of strings (from, to) and an int weight
-Graph::Graph(vector<string>& nodes, vector<pair<pair<string, string>, int> >& edges) {
-	for (string& node: nodes) {
-		Node * newNode = new Node(node,0);
-		if (!nodes_.insert(pair<string, Node>(node, *newNode)).second) { //if unsuccessful
-			delete newNode;
-		}
-	}
-
-	for(vector<pair<pair<string, string>, int> >::iterator it = edges.begin(); it != edges.end(); it++) {
-		Node& from = getNode(it->first.first);
-		Node& to = getNode(it->first.second);
-		vector<Edge> newEdgeList;
-		newEdgeList.push_back(Edge(from, to, it->second));
-		//Edge * newEdgeList = new Edge(from, to, it->second);
-		pair<map<Node, vector<Edge> >::iterator, bool> res =
-				edges_.insert(pair<Node, vector<Edge> >(from, newEdgeList));
-		if (!res.second) { //if unsuccessful
-			vector<Edge>& e = res.first->second;
-			e.push_back(Edge(from,to, it->second));
-		}
-
-	}
-
-}
+Graph::Graph() {}
 
 Graph::~Graph() {
-	// TODO Auto-generated destructor stub
+//	unsigned int i;
+//	for(i = 0; i < nodes_.size(); i++) {
+//		delete nodes_[i];
+//	}
 }
 
-Graph::Node& Graph::getNode(std::string& str) {
-	return nodes_.at(str);
+void Graph::insertNode(string& str) {
+	addNode(str);
+}
+
+Graph::Node* Graph::addNode(string& str) {
+	Node* exists = getNode(str);
+	if(!exists){
+		Node * newNode = new Node(str, -1);
+		nodes_.push_back(newNode);
+		return newNode;
+	}
+	return exists;
+}
+
+void Graph::insertEdge(string& from, string& to, int w) {
+	Node* f = getNode(from);
+	Node* t = getNode(to);
+	if (!f)
+		f = addNode(from);
+	if (!t)
+		t = addNode(to);
+	Edge * newEdge = new Edge(*f, *t, w);
+	f->getEdges().push_back(newEdge);
+}
+
+Graph::Node* Graph::getNode(std::string& str) {
+	unsigned int i;
+	for(i = 0; i < nodes_.size(); i++) {
+		if (nodes_[i]->getLabel() == str)
+			return nodes_[i];
+	}
+	return NULL;
+}
+
+bool Graph::areDirectlyLinked(string& from, string& to) {
+	Node* f = getNode(from);
+	Node* t = getNode(to);
+	vector<Edge*>& e = f->getEdges();
+	for(Edge* i : e) {
+		if (i->getTo() == *t )
+			return true;
+	}
+	return false;
 }
 
 void Graph::dumpGraph() {
-	for(pair<string,Node> p: nodes_) {
-		Node n = p.second;
-		std::cout << n.toString() << endl;
-		vector<Edge>& e = edges_[n];
-		for (Edge i: e) {
-			cout << "+===" << i.toString() << endl;;
+	unsigned int i;
+	for(i = 0; i < nodes_.size(); i++) {
+		Node* n = nodes_[i];
+		std::cout << n->toString() << endl;
+		vector<Edge*>& e = n->getEdges();
+		unsigned int k;
+		for (k = 0; k < e.size(); k++) {
+			cout << "+===" << e[k]->toString() << endl;;
 		}
 	}
 }

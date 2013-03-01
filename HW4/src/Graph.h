@@ -17,11 +17,15 @@
 
 class Graph {
 public:
-	Graph(std::vector<std::string> & nodes, std::vector<std::pair<std::pair<std::string, std::string>, int> > & edges);
+	Graph();
+	void insertNode(std::string& str);
+	void insertEdge(std::string& str, std::string& to, int w);
+	bool areDirectlyLinked(std::string& from, std::string& to);
 	void dumpGraph();
 	virtual ~Graph();
 	void getPath(std::vector<std::string> & path, std::string & n1, std::string & n2);
 private:
+	class Edge;
 	class Node {
 		public:
 			Node(const std::string& label = "", int cost = 0):
@@ -32,8 +36,11 @@ private:
 				out << this << " " << label_ << " " << cost_;
 				return out.str();
 			}
+			std::vector<Edge*>& getEdges() {return edges_;}
 			bool operator<(const Node& rhs) const {return label_.compare(rhs.label_) < 0;}
+			bool operator==(const Node& rhs) const {return label_==rhs.label_;}
 		private:
+			std::vector<Edge*> edges_;
 			std::string label_;
 			int cost_;
 		};
@@ -42,8 +49,6 @@ private:
 		public:
 			Edge(Node & from, Node & to, int w):
 			from_(from), to_(to), w_(w){};
-//			Edge(std::pair<Node&, Node&>& nodes, int w):
-//				from_(nodes.first), to_(nodes.second), w_(w){};
 			Edge(const Edge& other):from_(other.from_), to_(other.to_), w_(other.w_){}
 			const Node& getFrom() {return from_;}
 			const Node& getTo() {return to_;}
@@ -77,9 +82,9 @@ private:
 			int w_;
 		};
 
-	Graph::Node& getNode(std::string& str);
-	std::map<std::string, Node> nodes_;
-	std::map<Node, std::vector<Edge>> edges_;
+	Graph::Node* getNode(std::string& str);
+	Graph::Node* addNode(std::string& str);
+	std::vector<Node*> nodes_;
 };
 
 #endif /* GRAPH_H_ */

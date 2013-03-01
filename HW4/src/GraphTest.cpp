@@ -27,6 +27,10 @@ int main() {
 		vector<string> elem(it, end);
 		g.insertEdge(elem[0], elem[1], atoi(elem[2].c_str()));
 	}
+	string ttt = "test";
+	g.insertNode(ttt);
+	ttt = "teeessst";
+	g.insertNode(ttt);
 	g.dumpGraph();
 	cout << endl;
 	cout << "From:";

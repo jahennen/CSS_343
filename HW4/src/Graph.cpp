@@ -55,6 +55,8 @@ Graph::Node* Graph::getNode(std::string& str) {
 bool Graph::areDirectlyLinked(string& from, string& to) {
 	Node* f = getNode(from);
 	Node* t = getNode(to);
+	if (!f || !t)
+		return false;
 	vector<Edge*>& e = f->getEdges();
 	for(Edge* i : e) {
 		if (i->getTo() == *t )

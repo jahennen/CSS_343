@@ -22,7 +22,6 @@ public:
 	Graph();
 	void insertNode(std::string& str);
 	void insertEdge(std::string& str, std::string& to, int w);
-	bool areDirectlyLinked(std::string& from, std::string& to);
 	void dumpGraph();
 	virtual ~Graph();
 	void getShortestPath(std::vector<std::string> & path, std::string & n1, std::string & n2);

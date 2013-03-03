@@ -1,0 +1,12 @@
+San Francisco	Los Angeles	10
+San Francisco	Salt Lake City	40
+Los Angeles	Denver	5
+Denver	San Francisco	5
+Denver	Salt Lake City	15
+Salt Lake City	Chicago	15
+Chicago	Nashville	20
+Nashville	Denver	10
+Albuquerque	Denver	40
+Albuquerque	Dallas	10
+Dallas	Miami	10
+Miami	Nashville	9

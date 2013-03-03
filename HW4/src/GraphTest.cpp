@@ -15,30 +15,27 @@ using namespace std;
 
 int main() {
 	ifstream in;
-	in.open("../tests/airports.txt");
+	in.open("../tests/cities.txt");
 	string line;
 	vector<string> nodes;
-	vector<pair<pair<string, string>, int > > edges;
 	Graph g;
 	while (getline(in, line)) {
 		stringstream strstr(line);
-		istream_iterator<string> it(strstr);
-		istream_iterator<string> end;
-		vector<string> elem(it, end);
+		vector<string> elem(3);
+		int i;
+		for(i = 0; i < 3; i++) {
+			(getline(strstr, elem[i], '\t'));
+		}
 		g.insertEdge(elem[0], elem[1], atoi(elem[2].c_str()));
 	}
-	string ttt = "test";
-	g.insertNode(ttt);
-	ttt = "teeessst";
-	g.insertNode(ttt);
 	g.dumpGraph();
 	cout << endl;
 	cout << "From:";
 	string f;
-	cin >> f;
+	getline(cin, f, '\n');
 	cout << "To:";
 	string t;
-	cin >> t;
+	getline(cin, t, '\n');
 	vector<string> path;
 	g.getShortestPath(path, f, t);
 	cout << endl;

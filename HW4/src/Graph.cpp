@@ -9,11 +9,9 @@
 
 using namespace std;
 
-Graph::Graph() {}
-
 Graph::~Graph() {
 	unsigned int i;
-	for(i = 0; i < nodes_.size(); i++) {
+	for (i = 0; i < nodes_.size(); i++) {
 		delete nodes_[i];
 	}
 }
@@ -24,7 +22,8 @@ void Graph::insertNode(string& str) {
 
 Graph::Node* Graph::addNode(string& str) {
 	Node* exists = getNode(str);
-	if(!exists){
+	if (!exists) {
+		gdraw_.add_node(str);
 		Node * newNode = new Node(str);
 		nodes_.push_back(newNode);
 		return newNode;
@@ -33,19 +32,25 @@ Graph::Node* Graph::addNode(string& str) {
 }
 
 void Graph::insertEdge(string& from, string& to, int w) {
+
 	Node* f = getNode(from);
 	Node* t = getNode(to);
-	if (!f)
+	if (!f) {
 		f = addNode(from);
-	if (!t)
+	}
+	if (!t) {
 		t = addNode(to);
+	}
+	stringstream s;
+	s << w;
+	gdraw_.add_edge(from, to, s.str());
 	Edge * newEdge = new Edge(*f, *t, w);
 	f->getEdges().push_back(newEdge);
 }
 
 Graph::Node* Graph::getNode(std::string& str) {
 	unsigned int i;
-	for(i = 0; i < nodes_.size(); i++) {
+	for (i = 0; i < nodes_.size(); i++) {
 		if (nodes_[i]->getLabel() == str)
 			return nodes_[i];
 	}
@@ -55,7 +60,7 @@ Graph::Node* Graph::getNode(std::string& str) {
 Graph::Node* Graph::findMinCost(set<Node*>& nodes) {
 	set<Node*>::iterator it;
 	Node* minCost = *nodes.begin();
-	for(it = nodes.begin(); it != nodes.end(); it++) {
+	for (it = nodes.begin(); it != nodes.end(); it++) {
 		Node* n = *it;
 		if (n->getCost() < minCost->getCost())
 			minCost = n;
@@ -69,26 +74,39 @@ Graph::Node* Graph::findMinCost(set<Node*>& nodes) {
 // number of nodes to get to the destination.
 int Graph::dijkstra(vector<Edge*>& djkpath, Node* from, Node* to) {
 	set<Node*> known;
-	set<Node*> unknown(nodes_.begin(),nodes_.end());
+	set<Node*> unknown(nodes_.begin(), nodes_.end());
 	from->setCost(0); // starting cost = 0
-	while(!known.count(to)) { // while destination is not known
+	gdraw_.relabel_node(from->getLabel(), "0");
+	while (!known.count(to)) { // while destination is not known
 		Node* next = findMinCost(unknown);
 		known.insert(next);
 		unknown.erase(next);
+		gdraw_.highlight_node(next->getLabel(), "orange");
+		emitter();
 		if (next->getCost() == INT_MAX) { // all remaining nodes are inaccessable, there is no path
 			return -1;
 		}
 		vector<Edge*>& paths = next->getEdges();
-		for(vector<Edge*>::iterator it = paths.begin(); it != paths.end(); it++) {
+		for (vector<Edge*>::iterator it = paths.begin(); it != paths.end();
+				it++) {
 			Edge* path = *it;
 			Node& n = path->getTo();
-			int cost = next->getCost()+path->getWeight();
+			int cost = next->getCost() + path->getWeight();
 			if (cost < n.getCost()) {
+				stringstream s;
+				s << cost;
+				gdraw_.relabel_node(n.getLabel(), s.str());
 				n.setCost(cost);
 				n.setprev(path);
 			}
 		}
+		emitter();
+		gdraw_.highlight_node(next->getLabel(), "blue");
+		if (next == from)
+			gdraw_.highlight_node(next->getLabel(), "green");
+		emitter();
 	}
+	gdraw_.highlight_node(to->getLabel(), "red");
 	Node* cur = to;
 	while (cur != from) {
 		djkpath.push_back(cur->getPrev());
@@ -100,6 +118,7 @@ int Graph::dijkstra(vector<Edge*>& djkpath, Node* from, Node* to) {
 // This function does some preprocessing of input and output for the dijkstra function.
 //
 void Graph::getShortestPath(vector<string>& path, string& from, string& to) {
+	emitter();
 	Node* f = getNode(from);
 	Node* t = getNode(to);
 	if (!f) {
@@ -119,38 +138,69 @@ void Graph::getShortestPath(vector<string>& path, string& from, string& to) {
 
 	vector<Edge*> djkpath; // will contain reverse path, to->from
 	stack<string> reverser;
-	if(dijkstra(djkpath, f, t)== -1) {
+	if (dijkstra(djkpath, f, t) == -1) {
 		reverser.push(string("No path exists"));
 	}
 	// Stringify all edges and push into stack
 	unsigned int i;
-	for(i = 0; i < djkpath.size(); i++) {
+	for (i = djkpath.size(); i > 0; --i) {
+		Edge * e = djkpath[i-1];
+		if (e) {
+			gdraw_.highlight_edge(e->getFrom().getLabel(), e->getTo().getLabel(),
+					"red");
+			emitter();
+		}
+	}
+
+	for (i = 0; i < djkpath.size(); i++) {
 		ostringstream out;
 		Edge * e = djkpath[i];
-		out << e->getFrom().getLabel() << "\t" << e->getTo().getLabel() << "\t" << e->getWeight();
+		out << e->getFrom().getLabel() << "\t" << e->getTo().getLabel() << "\t"
+				<< e->getWeight();
 		reverser.push(out.str());
+//		gdraw_.highlight_edge(e->getFrom().getLabel(), e->getTo().getLabel(),
+//				"red");
+//		emitter();
 	}
 	// Pop stack into path vector to be returned.
-	while(!reverser.empty()) {
+	while (!reverser.empty()) {
 		path.push_back(reverser.top());
 		reverser.pop();
 	}
 	// Reset costs and prev of each node for future calls
-	for(i = 0; i < nodes_.size(); i++) {
+	for (i = 0; i < nodes_.size(); i++) {
 		nodes_[i]->setCost(INT_MAX);
 		nodes_[i]->setprev(NULL);
 	}
 }
 
+void Graph::emitter() {
+	if (isEmitting_) {
+		ofstream out;
+		stringstream outName;
+		outName << basename_;
+		char cbuf[10];
+		sprintf(cbuf, "%04d", count_);
+		outName << cbuf;
+		outName << ".dot";
+		out.open(outName.str().c_str());
+		gdraw_.emit(out);
+		count_++;
+	} else {
+		return;
+	}
+}
+
 void Graph::dumpGraph() {
 	unsigned int i;
-	for(i = 0; i < nodes_.size(); i++) {
+	for (i = 0; i < nodes_.size(); i++) {
 		Node* n = nodes_[i];
 		std::cout << n->toString() << endl;
 		vector<Edge*>& e = n->getEdges();
 		unsigned int k;
 		for (k = 0; k < e.size(); k++) {
-			cout << "+===" << e[k]->toString() << endl;;
+			cout << "+===" << e[k]->toString() << endl;
+			;
 		}
 	}
 }

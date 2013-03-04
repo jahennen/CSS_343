@@ -8,6 +8,7 @@
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
+#include "graph-draw.h"
 #include <vector>
 #include <stack>
 #include <map>
@@ -16,10 +17,13 @@
 #include <iostream>
 #include <sstream>
 #include <climits>
+#include <cstdlib>
+#include <cstdio>
 
 class Graph {
 public:
-	Graph();
+	Graph(std::string basename = "", bool isEmitting = 0):
+		basename_(basename), count_(0), isEmitting_(isEmitting){};
 	void insertNode(std::string& str);
 	void insertEdge(std::string& str, std::string& to, int w);
 	void dumpGraph();
@@ -79,8 +83,14 @@ private:
 	Graph::Node* findMinCost(std::set<Node*>& nodes);
 	Graph::Node* getNode(std::string& str);
 	Graph::Node* addNode(std::string& str);
+	void emitter();
 
 	std::vector<Node*> nodes_;
+	std::string basename_;
+	int count_;
+	bool isEmitting_;
+	GraphDraw gdraw_;
+
 };
 
 #endif /* GRAPH_H_ */

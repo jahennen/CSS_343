@@ -5,7 +5,7 @@
 CFLAGS = -Wall -g -o
 
 SUPPORT_FILES = Graph.cpp
-SUPPORT_CPP = Graph.cpp
+SUPPORT_CPP = Graph.cpp graph-draw.cc
 
 gtest: GraphTest.cpp $(SUPPORT_FILES)
 	g++ $(CFLAGS) gtest GraphTest.cpp $(SUPPORT_CPP)

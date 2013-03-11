@@ -8,25 +8,69 @@
 #ifndef EVENT_H_
 #define EVENT_H_
 
+#include <iostream>
+
+
+class State;
+class CUOff;
+class OUOff;
+class CSOff;
+class OSOff;
+class CROn;
+
 class Event {
 public:
-	virtual ~Event();
-	static virtual Event* getInstanceOf()=0;
-	static Event* e=0;
+	virtual State* getNextState(CUOff* s);
+	virtual State* getNextState(OUOff* s);
+	virtual State* getNextState(CSOff* s);
+	virtual State* getNextState(OSOff* s);
+	virtual State* getNextState(CROn* s);
 private:
-	Event();
+	virtual void pure()=0;
 };
 
 class OPEN_DOOR : public Event {
 public:
-	virtual State* getEvent(CUOff* s) {
-		return COOff::getInstanceOf();
-	}
+	virtual State* getNextState(CUOff* s);
+	virtual State* getNextState(CSOff* s);
+	virtual State* getNextState(CROn* s);
+private:
+	void pure(){};
 };
-class CLOSE_DOOR : public Event {};
-class SET_TIMER : public Event {};
-class PRESS_START : public Event {};
-class PRESS_CANCEL : public Event {};
-class DING : public Event {};
+class CLOSE_DOOR : public Event {
+public:
+	virtual State* getNextState(OUOff* s);
+	virtual State* getNextState(OSOff* s);
+private:
+	void pure(){};
+};
+class SET_TIMER : public Event {
+public:
+	virtual State* getNextState(CUOff* s);
+	virtual State* getNextState(CSOff* s);
+	virtual State* getNextState(OUOff* s);
+private:
+	void pure(){};
+};
+class PRESS_START : public Event {
+public:
+	virtual State* getNextState(CSOff* s);
+private:
+	void pure(){}
+};
+class PRESS_CANCEL : public Event {
+public:
+	virtual State* getNextState(CSOff* s);
+	virtual State* getNextState(OSOff* s);
+	virtual State* getNextState(CROn* s);
+private:
+	void pure(){}
+};
+class DING : public Event {
+public:
+	virtual State* getNextState(CROn* s);
+private:
+	void pure(){}
+};
 
 #endif /* EVENT_H_ */

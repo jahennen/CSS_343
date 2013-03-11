@@ -1,0 +1,33 @@
+         INITIAL	CLOSED	UNSET	OFF
+invalid event
+      CLOSE_DOOR	CLOSED	UNSET	OFF
+invalid event
+            DING	CLOSED	UNSET	OFF
+invalid event
+            DING	CLOSED	UNSET	OFF
+       SET_TIMER	CLOSED	SET	OFF
+invalid event
+            DING	CLOSED	SET	OFF
+    PRESS_CANCEL	CLOSED	UNSET	OFF
+invalid event
+      CLOSE_DOOR	CLOSED	UNSET	OFF
+invalid event
+      CLOSE_DOOR	CLOSED	UNSET	OFF
+       OPEN_DOOR	OPEN	UNSET	OFF
+      CLOSE_DOOR	CLOSED	UNSET	OFF
+       SET_TIMER	CLOSED	SET	OFF
+invalid event
+            DING	CLOSED	SET	OFF
+invalid event
+      CLOSE_DOOR	CLOSED	SET	OFF
+       SET_TIMER	CLOSED	SET	OFF
+invalid event
+      CLOSE_DOOR	CLOSED	SET	OFF
+invalid event
+            DING	CLOSED	SET	OFF
+    PRESS_CANCEL	CLOSED	UNSET	OFF
+invalid event
+            DING	CLOSED	UNSET	OFF
+invalid event
+            DING	CLOSED	UNSET	OFF
+       OPEN_DOOR	OPEN	UNSET	OFF

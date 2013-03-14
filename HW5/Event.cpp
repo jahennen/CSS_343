@@ -37,7 +37,7 @@ State* PRESS_START::getNextState(CSOff* s) {return CROn::getInstanceOf();}
 
 State* PRESS_CANCEL::getNextState(CSOff* s) {return CUOff::getInstanceOf();}
 State* PRESS_CANCEL::getNextState(OSOff* s) {return OUOff::getInstanceOf();}
-State* PRESS_CANCEL::getNextState(CROn* s) {return CUOff::getInstanceOf();}
+State* PRESS_CANCEL::getNextState(CROn* s) {return CSOff::getInstanceOf();}
 
 State* DING::getNextState(CROn* s) {return CUOff::getInstanceOf();}
 

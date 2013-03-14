@@ -21,9 +21,11 @@ int main() {
 	events[string("PRESS_START")] = new PRESS_START();
 	events[string("PRESS_CANCEL")] = new PRESS_CANCEL();
 	events[string("DING")] = new DING();
+
 	State* s = CUOff::getInstanceOf();
 	printf("%16s\t", "INITIAL");
 	cout << s->toString() << endl;
+
 	while (getline(cin, line)) {
 		s = s->getNextState(events[line]);
 		printf("%16s\t", line.c_str());

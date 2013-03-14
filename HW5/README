@@ -1,0 +1,20 @@
+CSS 343 Assignment 5 Submission README
+
+Author: Jay Hennen
+
+Included files:
+
+Event.h
+Event.cpp
+State.h
+State.cpp
+Microwave.cpp
+Run_ass5.sh
+test.txt (assignment sample input)
+demo.txt (assignment sample output)
+
+This is a basic representation of a microwave using a finite state machine.
+Double dispatch is used to transition between states on the proper event.
+If an inproper event is requested on a state, then an error is printed and
+the state does not change, else the state changes and the new state is printed
+to std out

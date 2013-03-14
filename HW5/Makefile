@@ -1,6 +1,5 @@
 # Makefile for assignment 5
 # Author: Jay Hennen
-# Not very useful except to elimiate typing
 
 CFLAGS = -Wall -g -o
 

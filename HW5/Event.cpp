@@ -10,16 +10,15 @@
 
 using namespace std;
 
-State* error(State* s) {
+void error() {
 	cout << "invalid event" << endl;
-	return s;
 }
 
-State* Event::getNextState(CUOff* s) {return error(s);}
-State* Event::getNextState(OUOff* s) {return error(s);}
-State* Event::getNextState(CSOff* s) {return error(s);}
-State* Event::getNextState(OSOff* s) {return error(s);}
-State* Event::getNextState(CROn* s) {return error(s);}
+State* Event::getNextState(CUOff* s) {error(); return s;}
+State* Event::getNextState(OUOff* s) {error(); return s;}
+State* Event::getNextState(CSOff* s) {error(); return s;}
+State* Event::getNextState(OSOff* s) {error(); return s;}
+State* Event::getNextState(CROn* s) {error(); return s;}
 
 
 State* OPEN_DOOR::getNextState(CUOff* s) {return OUOff::getInstanceOf();}
